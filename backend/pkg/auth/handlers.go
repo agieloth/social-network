@@ -238,40 +238,68 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func SendFollowRequest(w http.ResponseWriter, r *http.Request) {
-	var req FollowRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Check if already sent
+	cookie, err := r.Cookie("session_id")
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	followerID := cookie.Value
+
+	// Get followed_id from JSON body
+	var req struct {
+		FollowedID string `json:"followed_id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+		return
+	}
+
+	// Check if follow already exists
 	var exists int
-	query := `
-        SELECT COUNT(*) FROM followers 
-        WHERE follower_id = ? AND followed_id = ?;
-    `
-	err = sqlite.DB.QueryRow(query, req.FollowerID, req.FollowedID).Scan(&exists)
+
+	err = sqlite.DB.QueryRow(
+		`SELECT COUNT(*) FROM followers WHERE follower_id = ? AND followed_id = ?`,
+		followerID, req.FollowedID).Scan(&exists)
+
 	if err != nil {
 		http.Error(w, "DB error", http.StatusInternalServerError)
 		return
 	}
+
 	if exists > 0 {
-		http.Error(w, "Already sent follow request", http.StatusConflict)
+		http.Error(w, "Follow request already sent", http.StatusConflict)
 		return
 	}
 
-	// Insert follow request
-	stmt := `
-        INSERT INTO followers (follower_id, followed_id, status) 
-        VALUES (?, ?, 'pending');
-    `
-	_, err = sqlite.DB.Exec(stmt, req.FollowerID, req.FollowedID)
+	// Check if followed user is public or private
+	var isPrivate int
+	err = sqlite.DB.QueryRow(`SELECT is_private FROM users WHERE id = ?`, req.FollowedID).Scan(&isPrivate)
 	if err != nil {
-		http.Error(w, "Could not send follow request", http.StatusInternalServerError)
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	status := "pending"
+	if isPrivate == 0 {
+		status = "accepted"
+	}
+
+	_, err = sqlite.DB.Exec(`
+		INSERT INTO followers (follower_id, followed_id, status)
+		VALUES (?, ?, ?)`, followerID, req.FollowedID, status)
+
+	if err != nil {
+		http.Error(w, "Insert error", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Follow request sent ✅"))
+	fmt.Fprint(w, "Follow request sent")
 }
+
