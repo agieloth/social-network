@@ -45,6 +45,14 @@ type FollowRequest struct {
     FollowedID int `json:"followed_id"` // target user
 }
 
+type SearchResult struct {
+	ID        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Nickname  string `json:"nickname"`
+}
+
+
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -205,41 +213,60 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func SearchUsers(w http.ResponseWriter, r *http.Request) {
-	query := strings.ToLower(r.URL.Query().Get("query"))
+func SearchUsersHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("query")
 	if query == "" {
-		http.Error(w, "Missing query", http.StatusBadRequest)
+		http.Error(w, "Missing search query", http.StatusBadRequest)
 		return
 	}
+
+	search := "%" + strings.ToLower(query) + "%"
 
 	rows, err := sqlite.DB.Query(`
 		SELECT id, first_name, last_name, nickname
 		FROM users
 		WHERE LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(nickname) LIKE ?
-	`, "%"+query+"%", "%"+query+"%", "%"+query+"%")
+	`, search, search, search)
 	if err != nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	var users []map[string]string
+	var results []SearchResult
 	for rows.Next() {
-		var id int
-		var first, last, nick string
-		rows.Scan(&id, &first, &last, &nick)
-		users = append(users, map[string]string{
-			"id":         string(rune(id)),
-			"first_name": first,
-			"last_name":  last,
-			"nickname":   nick,
-		})
+		var u SearchResult
+		if err := rows.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Nickname); err != nil {
+			continue
+		}
+		results = append(results, u)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(results)
 }
- 
+
+
+
+func GetUserByID(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/api/user/")
+
+	var user User
+	query := `SELECT id, email, first_name, last_name, date_of_birth, nickname, about, avatar FROM users WHERE id = ?`
+	err := sqlite.DB.QueryRow(query, id).Scan(
+		&user.ID, &user.Email, &user.FirstName, &user.LastName,
+		&user.DateOfBirth, &user.Nickname, &user.About, &user.Avatar,
+	)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+}
+
+
 
 func SendFollowRequest(w http.ResponseWriter, r *http.Request) {
     var req FollowRequest

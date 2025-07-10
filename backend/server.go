@@ -20,8 +20,8 @@ func main() {
 	mux.HandleFunc("/api/register", auth.RegisterHandler)
 	mux.HandleFunc("/api/logout", auth.LogoutHandler)
 	mux.HandleFunc("/api/profile", auth.ProfileHandler)
-	// mux.HandleFunc("/search", auth.SearchUsers)
-	// mux.HandleFunc("/follow", handlers.SendFollowRequest)
+    mux.HandleFunc("/search", auth.SearchUsersHandler)
+	mux.HandleFunc("/api/user/", auth.GetUserByID)
 
 	// Wrap entire mux with CORS middleware once
 	handlerWithCors := auth.CorsMiddleware(mux)

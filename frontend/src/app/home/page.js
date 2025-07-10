@@ -8,6 +8,9 @@ export default function HomePage() {
   const [search, setSearch] = useState('')
   const [results, setResults] = useState([])
 
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [showPopup, setShowPopup] = useState(false)
+
     const router = useRouter()
 
   // Load current user data on page load
@@ -69,6 +72,23 @@ export default function HomePage() {
     }
   }
 
+
+  const handleUserClick = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:8080/api/user/${id}`, {
+      credentials: 'include',
+    })
+    if (!res.ok) throw new Error('User not found')
+    const data = await res.json()
+    setSelectedUser(data)
+    setShowPopup(true)
+  } catch (err) {
+    console.error('Error loading user profile:', err)
+  }
+}
+
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
@@ -90,11 +110,15 @@ export default function HomePage() {
               <div
                 key={u.id}
                 className="p-3 hover:bg-gray-100 cursor-pointer border-b"
+              onClick={() => handleUserClick(u.id)}
               >
+                
                 <p className="font-medium">
-                  {u.first_name} {u.last_name}
+                  
+                  {u.first_name}{u.last_name}
                 </p>
                 <p className="text-sm text-gray-500">@{u.nickname}</p>
+                
               </div>
             ))}
           </div>
@@ -127,9 +151,40 @@ export default function HomePage() {
           )}
         </div>
 
-      </nav>
+     </nav>
+
+{showPopup && selectedUser && (
+  <div className="fixed inset-0 flex justify-center items-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
+      <button
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-500"
+        onClick={() => setShowPopup(false)}
+      >
+        ✖
+      </button>
+
+      <div className="flex flex-col items-center">
+        <img
+          src={selectedUser.Avatar || '/avatar.png'}
+          className="w-20 h-20 rounded-full mb-3"
+          alt="avatar"
+        />
+        <h2 className="text-sm text-blue-600 mt-2">
+          {selectedUser.FirstName} {selectedUser.LastName}
+        </h2>
+        <p className="text-sm text-blue-600 mt-2">@{selectedUser.Nickname}</p>
+        {selectedUser.About && (
+          <p className="text-sm text-blue-600 mt-2">{selectedUser.About}</p>
+        )}
+        <p className="text-sm text-blue-600 mt-2">{selectedUser.Email}</p>
+      </div>
+    </div>
+  </div>
+)}
+
 
     
     </div>
+     
   )
 }
