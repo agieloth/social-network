@@ -24,8 +24,16 @@ func main() {
 
 	mux.HandleFunc("/api/follow", auth.SendFollowRequest)
 
+	mux.HandleFunc("/api/users", auth.GetAllChatUsers)
+
 	handlerWithCors := auth.CorsMiddleware(mux)
 
+
+
+
+
+
+	
 	fmt.Println("✅ Server started at :8080")
 
 	http.ListenAndServe(":8080", handlerWithCors)

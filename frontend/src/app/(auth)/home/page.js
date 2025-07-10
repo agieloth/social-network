@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
+  
+  const router = useRouter()
+  
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [content, setContent] = useState('')
@@ -20,8 +23,40 @@ export default function HomePage() {
 
   const [showMessages, setShowMessages] = useState(false)
 
+  const [chatUsers, setChatUsers] = useState([])
 
-  const router = useRouter()
+
+  const [openChats, setOpenChats] = useState([])
+
+const openChat = (user) => {
+  if (!openChats.some((c) => c.id === user.id)) {
+    setOpenChats((prev) => [...prev, user])
+  }
+}
+
+  
+
+
+  useEffect(() => {
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/api/users', {
+        credentials: 'include',
+      })
+      if (!res.ok) throw new Error('Failed to fetch users')
+      const data = await res.json()
+      setChatUsers(data)
+
+    } catch (err) {
+      console.error('Error fetching users:', err)
+    }
+  }
+
+  fetchUsers()
+}, [])
+
+
 
   // Charger utilisateur
   useEffect(() => {
@@ -220,18 +255,65 @@ export default function HomePage() {
   }`}
 >
   <div className="flex justify-between items-center p-4 border-b">
-    <h2 className="text-lg font-semibold">📨 Messages</h2>
+    <h2 className="text-lg font-semibold text-gray-800">📨 Messages</h2>
     <button onClick={() => setShowMessages(false)} className="text-gray-500 hover:text-gray-800">
       ✖
     </button>
   </div>
 
   {/* Placeholder content */}
-  <div className="p-4 text-gray-600">
-    <p>Start a conversation with your friends 💬</p>
-    <p className="text-sm mt-2">Messaging coming soon...</p>
-  </div>
+
+ {chatUsers.map((u) => (
+    <div
+      key={u.id}
+      className="flex items-center gap-2 mb-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+      onClick={() => openChat(u)}
+    >
+      <img src={u.avatar || '/avatar.png'} className="w-8 h-8 rounded-full" />
+      <span className="text-sm font-medium text-gray-800">{u.full_name}</span>
+    </div>
+  ))}
+
+
 </div>
+
+
+{/* 🧩 Floating Chat Boxes */}
+<div className="fixed bottom-4 right-72 flex gap-4 z-40">
+  {openChats.map((u) => (
+    <div key={u.id} className="w-64 bg-white rounded-lg shadow-lg border p-3">
+      <div className="flex justify-between items-center mb-2">
+        <span className="font-medium text-gray-500">{u.full_name}</span>
+        <button
+          className="text-red-500 text-xs"
+          onClick={() =>
+            setOpenChats(openChats.filter((c) => c.id !== u.id))
+          }
+        >
+          ✖
+        </button>
+      </div>
+      <div className="h-32 overflow-y-auto bg-gray-50 rounded p-2 text-sm text-gray-700">
+        {/* 💬 Message history will go here */}
+        <p className="text-gray-400 italic">No messages yet...</p>
+      </div>
+      <div className="mt-2 flex">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          className="flex-1 border rounded-l px-2 py-1 text-sm"
+        />
+        <button className="bg-blue-500 text-white px-2 rounded-r text-sm">
+          Send
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+
+
+
 
       {/* 💬 FORMULAIRE DE POST */}
       <div className="max-w-xl mx-auto mt-6 px-4">
