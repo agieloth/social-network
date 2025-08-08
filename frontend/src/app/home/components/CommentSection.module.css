@@ -1,0 +1,100 @@
+.commentSectionContainer {
+    margin-top: 1rem;
+    border-top: 1px solid #4a5568;
+    padding-top: 1rem;
+}
+
+.commentForm {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.textarea {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    resize: none;
+}
+
+.fileInput {
+    /* Style as needed, Tailwind classes were not applied directly */
+}
+
+.submitButton {
+    align-self: flex-end;
+    background-color: #2563eb;
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.submitButton:hover {
+    background-color: #1d4ed8;
+}
+
+.commentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.commentItem {
+    background-color: #2d3748;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #4a5568;
+}
+
+.commentAuthorSection {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.commentAuthorAvatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: 1px solid #4a5568;
+    margin-right: 0.5rem;
+}
+
+.commentAuthorName {
+    font-weight: 500;
+    color: #63b3ed;
+}
+
+.commentAuthorName:hover {
+    text-decoration: underline;
+}
+
+.commentTimestamp {
+    font-size: 0.875rem;
+    color: #a0aec0;
+}
+
+.commentContent {
+    color: white;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.commentImage {
+    width: 100%;
+    max-width: 12rem; /* max-w-xs */
+    border-radius: 0.25rem;
+    border: 1px solid #4a5568;
+    margin-top: 0.25rem;
+}
+
+.noComments {
+    color: #a0aec0;
+    font-size: 0.875rem;
+    font-style: italic;
+}
