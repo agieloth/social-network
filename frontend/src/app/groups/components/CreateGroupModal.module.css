@@ -1,0 +1,109 @@
+/* /home/helbadao/social-network/frontend/src/app/groups/components/CreateGroupModal.module.css */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background-color: #1f2937;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+  border: 1px solid #374151;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+}
+
+.closeButton {
+  color: #9ca3af;
+}
+
+.closeButton:hover {
+  color: white;
+}
+
+.error {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #450a0a;
+  color: #fecaca;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #d1d5db;
+  margin-bottom: 0.25rem;
+}
+
+.formInput, .formTextarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 0.375rem;
+  color: white;
+}
+
+.formInput:focus, .formTextarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background-color: #4b5563;
+}
+
+.cancelButton:hover {
+  background-color: #6b7280;
+}
+
+.submitButton {
+  background-color: #2563eb;
+}
+
+.submitButton:hover {
+  background-color: #1d4ed8;
+}
+
+.buttonDisabled {
+  opacity: 0.5;
+}

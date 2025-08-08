@@ -1,0 +1,93 @@
+/* /home/helbadao/social-network/frontend/src/app/groups/components/CreatGroupPost.module.css */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+}
+
+.darkTextarea {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: white;
+}
+
+.placeholder::placeholder {
+  color: #9ca3af;
+}
+
+.darkPlaceholder::placeholder {
+  color: #6b7280;
+}
+
+.flexContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.darkLabel {
+  color: #d1d5db;
+}
+
+.fileInput {
+  width: 100%;
+}
+
+.recipientsContainer {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+}
+
+.darkRecipientsContainer {
+  border-color: #4b5563;
+}
+
+.recipientsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.recipientLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.darkRecipientLabel {
+  color: #d1d5db;
+}
+
+.checkbox {
+  border-radius: 0.25rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #2563eb;
+  color: white;
+  align-self: flex-end;
+}
+
+.darkButton {
+  background-color: #3b82f6;
+}
+
+.button:disabled {
+  opacity: 0.5;
+}

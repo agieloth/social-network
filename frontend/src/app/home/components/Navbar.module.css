@@ -1,0 +1,331 @@
+.navbar {
+    background-color: #1a202c;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #2d3748;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.searchContainer {
+    max-width: 42rem;
+    width: 100%;
+    position: relative;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #f7fafc;
+    placeholder-color: #a0aec0;
+}
+
+.searchInput:focus {
+    outline: none;
+}
+
+.resultsContainer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: #2d3748;
+    margin-top: 0.5rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 30;
+    border: 1px solid #4a5568;
+    max-height: 16rem;
+    overflow-y: auto;
+}
+
+.resultItem {
+    padding: 0.75rem;
+    cursor: pointer;
+    border-bottom: 1px solid #4a5568;
+}
+
+.resultItem:hover {
+    background-color: #4a5568;
+}
+
+.resultName {
+    font-weight: 500;
+    color: white;
+}
+
+.resultNickname {
+    font-size: 0.875rem;
+    color: #a0aec0;
+}
+
+.actionsContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1rem;
+    position: relative;
+}
+
+.actionButton img {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.notificationsContainer {
+    position: relative;
+}
+
+.notificationButton {
+    position: relative;
+    padding: 0.25rem;
+}
+
+.notificationButton img {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.unreadCount {
+    position: absolute;
+    top: -0.25rem;
+    left: -0.25rem;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+    height: 1rem;
+    width: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notificationsDropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    width: 20rem;
+    background-color: #1a202c;
+    border: 1px solid #4a5568;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    z-index: 50;
+    max-height: 24rem;
+    overflow-y: auto;
+}
+
+.dropdownHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.dropdownTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+}
+
+.closeButton {
+    color: #a0aec0;
+}
+
+.closeButton:hover {
+    color: white;
+}
+
+.noNotifications {
+    color: #a0aec0;
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+}
+
+.notificationsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notificationItem {
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid;
+}
+
+.notificationItem.seen {
+    background-color: #2d3748;
+    border-color: #4a5568;
+}
+
+.notificationItem.unseen {
+    background-color: #2b6cb0;
+    border-color: #3182ce;
+}
+
+.notificationMessage {
+    font-size: 0.875rem;
+    color: white;
+    word-break: break-word;
+}
+
+.notificationTimestamp {
+    font-size: 0.75rem;
+    color: #a0aec0;
+    margin-top: 0.25rem;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.acceptButton,
+.rejectButton {
+    font-size: 0.75rem;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+}
+
+.acceptButton {
+    background-color: #38a169;
+}
+
+.acceptButton:hover {
+    background-color: #2f855a;
+}
+
+.rejectButton {
+    background-color: #e53e3e;
+}
+
+.rejectButton:hover {
+    background-color: #c53030;
+}
+
+.groupsLink {
+    color: #d1d5db;
+}
+
+.groupsLink:hover {
+    color: white;
+}
+
+.profileContainer {
+    position: relative;
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 1px solid #3182ce;
+    cursor: pointer;
+}
+
+.profileDropdown {
+    position: absolute;
+    right: 0;
+    margin-top: 0.5rem;
+    width: 16rem;
+    background-color: #1a202c;
+    border: 1px solid #4a5568;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    z-index: 20;
+}
+
+.profileName {
+    font-weight: 600;
+    color: white;
+}
+
+.profileEmail {
+    font-size: 0.875rem;
+    color: #63b3ed;
+    margin-top: 0.25rem;
+}
+
+.privacyContainer {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.privacyText {
+    font-size: 0.875rem;
+    color: #d1d5db;
+}
+
+.privacyToggle {
+    width: 3rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.25rem;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.privacyToggle.private {
+    background-color: #ef4444;
+}
+
+.privacyToggle.public {
+    background-color: #22c55e;
+}
+
+.privacyToggleIndicator {
+    background-color: white;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+}
+
+.privacyToggle.private .privacyToggleIndicator {
+    transform: translateX(1.5rem);
+}
+
+.profileLink,
+.logoutButton {
+    margin-top: 0.75rem;
+    width: 100%;
+    font-size: 0.875rem;
+    text-align: left;
+}
+
+.profileLink {
+    color: #34d399;
+}
+
+.profileLink:hover {
+    text-decoration: underline;
+}
+
+.logoutButton {
+    color: #f87171;
+}
+
+.logoutButton:hover {
+    text-decoration: underline;
+}

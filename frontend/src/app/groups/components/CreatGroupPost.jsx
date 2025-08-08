@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState, forwardRef } from 'react'
-import styles from './PostForm.module.css'
+import styles from './CreatGroupPost.module.css'
 
 const PostForm = forwardRef(function PostForm(
   { content, setContent, image, setImage, privacy, setPrivacy, handleSubmit, creating },
@@ -23,19 +23,19 @@ const PostForm = forwardRef(function PostForm(
   }
 
   return (
-    <form onSubmit={onSubmit} className={`${styles.form} dark:${styles.darkForm}`}>
+    <form onSubmit={onSubmit} className={`${styles.form} ${styles.darkForm}`}>
       <textarea
         placeholder="Exprimez-vous..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className={`${styles.textarea} dark:${styles.darkTextarea} ${styles.placeholder} dark:${styles.darkPlaceholder}`}
+        className={`${styles.textarea} ${styles.darkTextarea} ${styles.placeholder} ${styles.darkPlaceholder}`}
         rows={4}
         required
       />
       
       <div className={styles.flexContainer}>
         <div className="flex-1">
-          <label className={`${styles.label} dark:${styles.darkLabel}`}>
+          <label className={`${styles.label} ${styles.darkLabel}`}>
             Image
           </label>
           <input
@@ -48,7 +48,7 @@ const PostForm = forwardRef(function PostForm(
         </div>
         
         <div className="flex-1">
-          <label className={`${styles.label} dark:${styles.darkLabel}`}>
+          <label className={`${styles.label} ${styles.darkLabel}`}>
             Confidentialité
           </label>
 
@@ -56,14 +56,14 @@ const PostForm = forwardRef(function PostForm(
       </div>
 
       {privacy === 'custom' && (
-        <div className={`${styles.recipientsContainer} dark:${styles.darkRecipientsContainer}`}>
-          <h3 className={`${styles.label} dark:${styles.darkLabel}`}>Choisissez les destinataires :</h3>
+        <div className={`${styles.recipientsContainer} ${styles.darkRecipientsContainer}`}>
+          <h3 className={`${styles.label} ${styles.darkLabel}`}>Choisissez les destinataires :</h3>
           {Array.isArray(recipients) && recipients.length === 0 ? (
-            <p className={`${styles.placeholder} dark:${styles.darkPlaceholder}`}>Aucun abonné disponible.</p>
+            <p className={`${styles.placeholder} ${styles.darkPlaceholder}`}>Aucun abonné disponible.</p>
           ) : (
             <div className={styles.recipientsGrid}>
               {(recipients || []).map((user) => (
-                <label key={user.id} className={`${styles.recipientLabel} dark:${styles.darkRecipientLabel}`}>
+                <label key={user.id} className={`${styles.recipientLabel} ${styles.darkRecipientLabel}`}>
                   <input
                     type="checkbox"
                     checked={recipientIds.includes(user.id)}
@@ -80,7 +80,7 @@ const PostForm = forwardRef(function PostForm(
       <button
         type="submit"
         disabled={creating}
-        className={`${styles.button} dark:${styles.darkButton}`}
+        className={`${styles.button} ${styles.darkButton}`}
       >
         {creating ? 'Publication...' : 'Publier'}
       </button>

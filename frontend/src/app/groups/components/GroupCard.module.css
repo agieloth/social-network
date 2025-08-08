@@ -1,0 +1,85 @@
+/* /home/helbadao/social-network/frontend/src/app/groups/components/GroupCard.module.css */
+
+.card {
+  background-color: #1f2937;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #374151;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  border-color: #4b5563;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.75rem;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.adminBadge {
+  background-color: #7c3aed;
+}
+
+.description {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.meta span {
+  margin: 0 0.25rem;
+}
+
+.button {
+  font-size: 0.75rem;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.joinButton {
+  background-color: #2563eb;
+}
+
+.joinButton:hover {
+  background-color: #1d4ed8;
+}
+
+.pendingBadge {
+  background-color: #ca8a04;
+}
+
+.visitButton {
+  background-color: #16a34a;
+}
+
+.visitButton:hover {
+  background-color: #15803d;
+}

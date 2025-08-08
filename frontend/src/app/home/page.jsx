@@ -325,7 +325,7 @@ export default function HomePage() {
         )}
       </div>
 
-      <h2 className={styles.postsHeading}></h2>
+      
       {posts === null ? (
         <p className={styles.noPosts}>Aucun post à afficher.</p>
       ) : (

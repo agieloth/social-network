@@ -1,3 +1,5 @@
+/* /home/helbadao/social-network/frontend/src/app/groups/[groupId]/page.jsx */
+
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
@@ -6,6 +8,7 @@ import PendingRequests from '../components/PendingRequests'
 import PostForm from '../../home/components/PostForm'
 import { use } from 'react'
 import { useSharedWorker } from '../../../contexts/SharedWorkerContext'
+import styles from './GroupsPage.module.css'
 
 export default function GroupDetailPage({ params }) {
   // Group and UI state
@@ -395,7 +398,7 @@ export default function GroupDetailPage({ params }) {
   }, [groupId])
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-900">
+    <div className={styles.container}>
       <Navbar
         togglePostForm={togglePostForm}
         realtimeNotification={realtimeNotification}
@@ -404,18 +407,18 @@ export default function GroupDetailPage({ params }) {
         hideSearch={true}
         onNotificationRemoved={handleNotificationRemoved}
       />
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-800 rounded w-1/2"></div>
-          <div className="h-6 bg-gray-800 rounded w-3/4"></div>
-          <div className="h-40 bg-gray-800 rounded"></div>
+      <div className={styles.content}>
+        <div className={styles.loadingContainer}>
+          <div className={`${styles.loadingPulse} ${styles.loadingBar}`}></div>
+          <div className={`${styles.loadingPulse} ${styles.loadingBarShort}`}></div>
+          <div className={`${styles.loadingPulse} ${styles.loadingBarLong}`}></div>
         </div>
       </div>
     </div>
   )
 
   if (error) return (
-    <div className="min-h-screen bg-gray-900">
+    <div className={styles.container}>
       <Navbar
         togglePostForm={togglePostForm}
         realtimeNotification={realtimeNotification}
@@ -424,14 +427,14 @@ export default function GroupDetailPage({ params }) {
         hideSearch={true}
         onNotificationRemoved={handleNotificationRemoved}
       />
-      <div className="max-w-4xl mx-auto p-4 text-red-500">
+      <div className={`${styles.content} ${styles.errorContainer}`}>
         {error}
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className={styles.container}>
       <Navbar
         togglePostForm={togglePostForm}
         realtimeNotification={realtimeNotification}
@@ -442,8 +445,8 @@ export default function GroupDetailPage({ params }) {
       />
 
       {showPostForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
             <PostForm
               content={content}
               setContent={setContent}
@@ -460,13 +463,13 @@ export default function GroupDetailPage({ params }) {
       )}
 
       {showEventForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
-            <form onSubmit={handleEventSubmit} className="space-y-4">
-              <h2 className="text-xl font-bold text-white mb-4">Create New Event</h2>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <form onSubmit={handleEventSubmit} className={styles.form}>
+              <h2 className={styles.formTitle}>Create New Event</h2>
 
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
+              <div className={styles.formGroup}>
+                <label htmlFor="title" className={styles.formLabel}>
                   Event Title
                 </label>
                 <input
@@ -475,13 +478,13 @@ export default function GroupDetailPage({ params }) {
                   name="title"
                   value={eventForm.title}
                   onChange={handleEventChange}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={styles.formInput}
                   required
                 />
               </div>
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1">
+              <div className={styles.formGroup}>
+                <label htmlFor="description" className={styles.formLabel}>
                   Description
                 </label>
                 <textarea
@@ -490,13 +493,13 @@ export default function GroupDetailPage({ params }) {
                   value={eventForm.description}
                   onChange={handleEventChange}
                   rows={3}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={styles.formTextarea}
                   required
                 />
               </div>
 
-              <div>
-                <label htmlFor="eventDate" className="block text-sm font-medium text-gray-300 mb-1">
+              <div className={styles.formGroup}>
+                <label htmlFor="eventDate" className={styles.formLabel}>
                   Event Date & Time
                 </label>
                 <input
@@ -505,23 +508,23 @@ export default function GroupDetailPage({ params }) {
                   name="eventDate"
                   value={eventForm.eventDate}
                   onChange={handleEventChange}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={styles.formInput}
                   required
                 />
               </div>
 
-              <div className="flex justify-end space-x-3">
+              <div className={styles.formButtonContainer}>
                 <button
                   type="button"
                   onClick={() => setShowEventForm(false)}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                  className={`${styles.button} ${styles.buttonSecondary}`}
                   disabled={creatingEvent}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  className={`${styles.button} ${styles.buttonPrimary} ${creatingEvent ? styles.buttonDisabled : ''}`}
                   disabled={creatingEvent}
                 >
                   {creatingEvent ? 'Creating...' : 'Create Event'}
@@ -532,16 +535,16 @@ export default function GroupDetailPage({ params }) {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto p-4 pt-24">
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 mb-6 border border-gray-700/50">
-          <h1 className="text-3xl font-bold text-white mb-2">{group.title}</h1>
-          <p className="text-gray-300 mb-4">{group.description}</p>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <h1 className={styles.groupTitle}>{group.title}</h1>
+          <p className={styles.groupDescription}>{group.description}</p>
 
-          <div className="flex items-center space-x-4 text-sm text-gray-400">
+          <div className={styles.groupMeta}>
             <span>👥 {group.member_count} members</span>
             <span>🕒 Created {new Date(group.created_at).toLocaleDateString()}</span>
             {group.is_creator && (
-              <span className="bg-purple-600 text-white px-2 py-1 rounded text-xs">
+              <span className={styles.adminBadge}>
                 Admin
               </span>
             )}
@@ -549,11 +552,11 @@ export default function GroupDetailPage({ params }) {
         </div>
 
         {!group.is_member && !group.is_pending && !group.is_creator && (
-          <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4 mb-6">
-            <p className="text-blue-300">You're not a member of this group</p>
+          <div className={styles.joinPrompt}>
+            <p>You're not a member of this group</p>
             <button
               onClick={handleJoin}
-              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className={styles.joinButton}
             >
               Join Group
             </button>
@@ -561,28 +564,28 @@ export default function GroupDetailPage({ params }) {
         )}
 
         {group.is_pending && (
-          <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4 mb-6">
-            <p className="text-yellow-300">Your join request is pending approval</p>
+          <div className={styles.pendingPrompt}>
+            <p>Your join request is pending approval</p>
           </div>
         )}
 
-        <div className="flex border-b border-gray-700 mb-6">
+        <div className={styles.tabs}>
           <button
             onClick={() => setActiveTab('posts')}
-            className={`px-4 py-2 ${activeTab === 'posts' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-gray-400 hover:text-white'}`}
+            className={`${styles.tab} ${activeTab === 'posts' ? styles.activeTab : ''}`}
           >
             Posts
           </button>
           <button
             onClick={() => setActiveTab('events')}
-            className={`px-4 py-2 ${activeTab === 'events' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-gray-400 hover:text-white'}`}
+            className={`${styles.tab} ${activeTab === 'events' ? styles.activeTab : ''}`}
           >
             Events
           </button>
           {group.is_creator && (
             <button
               onClick={() => setActiveTab('requests')}
-              className={`px-4 py-2 ${activeTab === 'requests' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-gray-400 hover:text-white'}`}
+              className={`${styles.tab} ${activeTab === 'requests' ? styles.activeTab : ''}`}
             >
               Pending Requests
             </button>
@@ -590,11 +593,11 @@ export default function GroupDetailPage({ params }) {
         </div>
 
         {group.is_member || group.is_creator ? (
-          <div className="space-y-4">
+          <div className={styles.tabContent}>
             {activeTab === 'posts' && (
               <button
                 onClick={togglePostForm}
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className={styles.createButton}
               >
                 Create Post
               </button>
@@ -603,41 +606,41 @@ export default function GroupDetailPage({ params }) {
             {activeTab === 'events' && (
               <button
                 onClick={toggleEventForm}
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className={styles.createButton}
               >
                 Create Event
               </button>
             )}
 
             {activeTab === 'requests' && group.is_creator && (
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <div className={styles.postsContainer}>
                 <PendingRequests groupId={group.id} />
               </div>
             )}
 
             {activeTab === 'posts' && (
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <div className={styles.postsContainer}>
                 {posts.length > 0 ? (
                   posts.map(post => (
-                    <div key={post.id} className="mb-4 p-4 bg-gray-700/50 rounded-lg">
-                      <p className="text-white">{post.content}</p>
+                    <div key={post.id} className={styles.post}>
+                      <p className={styles.postContent}>{post.content}</p>
                       {post.image && (
                         <img
                           src={`${post.image}`}
                           alt="Post"
-                          className="mt-2 rounded-lg max-w-full h-auto"
+                          className={styles.postImage}
                         />
                       )}
 
-                      <div className="mt-4">
+                      <div className={styles.commentsSection}>
                         {loadingComments[post.id] ? (
-                          <div className="text-gray-400 text-sm">Loading comments...</div>
+                          <div className={styles.loadingComments}>Loading comments...</div>
                         ) : (
-                          <div className="space-y-3">
+                          <div className={styles.comments}>
                             {comments[post.id]?.map(comment => (
-                              <div key={comment.id} className="p-3 bg-gray-600/30 rounded">
-                                <p className="text-sm text-white">{comment.content}</p>
-                                <p className="text-xs text-gray-400 mt-1">
+                              <div key={comment.id} className={styles.comment}>
+                                <p className={styles.commentContent}>{comment.content}</p>
+                                <p className={styles.commentMeta}>
                                   {comment.creator_name} • {new Date(comment.created_at).toLocaleString()}
                                 </p>
                               </div>
@@ -645,18 +648,18 @@ export default function GroupDetailPage({ params }) {
                           </div>
                         )}
 
-                        <div className="flex items-center gap-2 mt-3">
+                        <div className={styles.commentForm}>
                           <input
                             type="text"
                             placeholder="Add a comment..."
                             value={commentInputs[post.id] || ''}
                             onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                            className="flex-1 px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className={styles.commentInput}
                           />
                           <button
                             onClick={() => handleCommentSubmit(post.id)}
                             disabled={postingComment[post.id]}
-                            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            className={`${styles.commentButton} ${postingComment[post.id] ? styles.commentButtonDisabled : ''}`}
                           >
                             {postingComment[post.id] ? 'Posting...' : 'Post'}
                           </button>
@@ -665,33 +668,33 @@ export default function GroupDetailPage({ params }) {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-400">No posts yet. Be the first to post!</p>
+                  <p className={styles.emptyState}>No posts yet. Be the first to post!</p>
                 )}
               </div>
             )}
 
             {activeTab === 'events' && (
-              <div className="space-y-4">
+              <div className={styles.eventsContainer}>
                 {events.length > 0 ? (
                   events.map((event) => (
                     <div
                       key={event.id}
-                      className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50 hover:border-gray-600 transition-all duration-200"
+                      className={styles.event}
                     >
                       <div className="space-y-4">
-                        <div className="flex justify-between items-start">
-                          <h3 className="text-xl font-bold text-white">{event.title}</h3>
+                        <div className={styles.eventHeader}>
+                          <h3 className={styles.eventTitle}>{event.title}</h3>
                           {group.is_creator && (
-                            <span className="bg-purple-600/30 text-purple-300 px-2 py-1 rounded text-xs">
+                            <span className={styles.organizerBadge}>
                               Organizer
                             </span>
                           )}
                         </div>
 
-                        <p className="text-gray-300">{event.description}</p>
+                        <p className={styles.eventDescription}>{event.description}</p>
 
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                          <div className="flex items-center text-blue-400">
+                        <div className={styles.eventMeta}>
+                          <div className={styles.eventMetaItem}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
@@ -705,7 +708,7 @@ export default function GroupDetailPage({ params }) {
                             })}
                           </div>
 
-                          <div className="flex items-center text-green-400">
+                          <div className={styles.eventMetaItemGreen}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -713,40 +716,32 @@ export default function GroupDetailPage({ params }) {
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-700">
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
+                        <div className={styles.eventActions}>
+                          <div className={styles.voteButtons}>
+                            <div className={styles.voteButtonContainer}>
                               <button
                                 onClick={() => handleVote(event.id, 'going')}
-                                className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${event.user_response === 'going'
-                                  ? 'bg-green-600/20 text-green-400 border border-green-600/50'
-                                  : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700 border border-gray-600/50'
-                                  }`}
-                              >
+                                className={`${styles.voteButton} ${event.user_response === 'going' ? styles.voteButtonGoing : ''}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 Going
                               </button>
-                              <span className="text-gray-300 text-sm px-2 py-1 bg-gray-700/50 rounded-lg">
+                              <span className={styles.voteCount}>
                                 {event.going_count || 0}
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className={styles.voteButtonContainer}>
                               <button
                                 onClick={() => handleVote(event.id, 'not_going')}
-                                className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${event.user_response === 'not_going'
-                                  ? 'bg-red-600/20 text-red-400 border border-red-600/50'
-                                  : 'bg-gray-700/50 text-gray-300 hover:bg-gray-700 border border-gray-600/50'
-                                  }`}
-                              >
+                                className={`${styles.voteButton} ${event.user_response === 'not_going' ? styles.voteButtonNotGoing : ''}`}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                                 Not Going
                               </button>
-                              <span className="text-gray-300 text-sm px-2 py-1 bg-gray-700/50 rounded-lg">
+                              <span className={styles.voteCount}>
                                 {event.not_going_count || 0}
                               </span>
                             </div>
@@ -756,17 +751,16 @@ export default function GroupDetailPage({ params }) {
                     </div>
                   ))
                 ) : (
-                  <div className="bg-gray-800/50 rounded-xl p-8 text-center border border-gray-700/50">
-                    <div className="flex flex-col items-center justify-center space-y-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className={styles.noEvents}>
+                    <div className={styles.noEventsContent}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className={styles.noEventsIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <h3 className="text-lg font-medium text-gray-400">No events yet</h3>
-                      <p className="text-gray-500">Be the first to create an event!</p>
+                      <h3 className={styles.noEventsTitle}>No events yet</h3>
+                      <p className={styles.noEventsText}>Be the first to create an event!</p>
                       <button
                         onClick={toggleEventForm}
-                        className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
-                      >
+                        className={styles.noEventsButton}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
@@ -779,15 +773,15 @@ export default function GroupDetailPage({ params }) {
             )}
           </div>
         ) : (
-          <div className="bg-gray-800/50 rounded-lg p-8 text-center">
-            <p className="text-gray-400">Join the group to see posts and events</p>
+          <div className={styles.noAccess}>
+            <p>Join the group to see posts and events</p>
           </div>
         )}
       </div>
 
       <button
         onClick={() => setShowGroupChat(true)}
-        className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg transition-colors z-40"
+        className={styles.chatButton}
         title="Group Chat"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -796,16 +790,16 @@ export default function GroupDetailPage({ params }) {
       </button>
 
       {showGroupChat && (
-        <div className="fixed inset-0 z-40 pointer-events-none">
-          <div className="absolute right-0 top-0 h-full w-96 bg-gray-800 shadow-lg border-l border-gray-700 flex flex-col pointer-events-auto">
-            <div className="flex justify-between items-center p-4 border-b border-gray-700">
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-white">Group Chat: {group?.title}</h3>
-                <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
+        <div className={styles.chatPopupOverlay}>
+          <div className={styles.chatPopup}>
+            <div className={styles.chatHeader}>
+              <div className={styles.chatTitleContainer}>
+                <h3 className={styles.chatTitle}>Group Chat: {group?.title}</h3>
+                <span className={`${styles.connectionStatus} ${isConnected ? styles.connected : styles.disconnected}`}></span>
               </div>
               <button
                 onClick={() => setShowGroupChat(false)}
-                className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700"
+                className={styles.chatCloseButton}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -813,22 +807,20 @@ export default function GroupDetailPage({ params }) {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className={styles.chatMessages}>
               {groupChatMessages.length === 0 ? (
-                <p className="text-gray-400 text-center py-10">
+                <p className={styles.emptyChat}>
                   {isConnected ? "No messages yet. Start the conversation!" : "Connecting to chat..."}
                 </p>
               ) : (
                 groupChatMessages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`flex ${msg.isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                  >
+                    className={`${styles.chatMessage} ${msg.isCurrentUser ? styles.justifyEnd : styles.justifyStart}`}>
                     <div
-                      className={`max-w-xs p-3 rounded-lg ${msg.isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
-                    >
-                      <p className="text-sm">{msg.content}</p>
-                      <p className="text-xs mt-1 opacity-70">
+                      className={`${styles.messageBubble} ${msg.isCurrentUser ? styles.currentUserMessage : styles.otherUserMessage}`}>
+                      <p className={styles.messageContent}>{msg.content}</p>
+                      <p className={styles.messageMeta}>
                         {msg.isCurrentUser ? 'You' : msg.sender_name || 'User'} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -837,8 +829,8 @@ export default function GroupDetailPage({ params }) {
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-700">
-              <div className="flex gap-2">
+            <div className={styles.chatInputContainer}>
+              <div className={styles.chatInputForm}>
                 <input
                   type="text"
                   value={groupChatInput}
@@ -846,13 +838,12 @@ export default function GroupDetailPage({ params }) {
                   onKeyPress={handleChatKeyPress}
                   placeholder={isConnected ? "Type a message..." : "Connecting..."}
                   disabled={!isConnected}
-                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+                  className={`${styles.chatInput} ${!isConnected ? styles.chatInputDisabled : ''}`}
                 />
                 <button
                   onClick={sendGroupChatMessage}
                   disabled={!groupChatInput.trim() || !isConnected}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
-                >
+                  className={`${styles.chatSendButton} ${(!groupChatInput.trim() || !isConnected) ? styles.chatSendButtonDisabled : ''}`}>
                   Send
                 </button>
               </div>

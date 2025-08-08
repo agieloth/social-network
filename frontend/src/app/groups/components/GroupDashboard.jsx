@@ -168,17 +168,16 @@ export default function GroupDashboard({ group, onClose, isCreator, nonMembers, 
   return (
     <div className={styles.groupDashboardOverlay}>
       <Navbar
-        user={user}
-        handleSearch={handleSearch}
-        handleLogout={handleLogout}
+        user={currentUser}
+        handleSearch={setSearch}
         results={results}
-        openMessages={openMessages}
+        openMessages={() => setShowMessages(true)}
         togglePostForm={togglePostForm}
         realtimeNotification={realtimeNotification}
         fetchChatUsers={fetchChatUsers}
         hideActions={true}
         hideSearch={true}
-        onNotificationRemoved={handleNotificationRemoved}
+        onNotificationRemoved={() => setRealtimeNotification(null)}
       />
 
       {showMessages && (
@@ -195,8 +194,8 @@ export default function GroupDashboard({ group, onClose, isCreator, nonMembers, 
       )}
 
       {showPostForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
             <PostForm
               content={content}
               setContent={setContent}

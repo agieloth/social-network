@@ -1,0 +1,186 @@
+.chatBox {
+    width: 24rem; /* w-96 */
+    background-color: #2d3748;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #4a5568;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.recipientName {
+    font-weight: 500;
+    color: white;
+}
+
+.closeButton {
+    color: #f56565;
+    font-size: 0.75rem;
+}
+
+.closeButton:hover {
+    color: #f19999;
+}
+
+.messagesContainer {
+    max-height: 60vh;
+    min-height: 300px;
+    overflow-y: auto;
+    background-color: #1a202c;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    color: #d1d5db;
+    flex: 1;
+    margin-bottom: 0.5rem;
+}
+
+.errorContainer {
+    text-align: center;
+    padding: 1rem;
+}
+
+.errorIcon {
+    color: #f56565;
+    margin-bottom: 0.5rem;
+}
+
+.errorText {
+    color: #f56565;
+    font-size: 0.875rem;
+}
+
+.errorHint {
+    color: #718096;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.noMessages {
+    color: #718096;
+    font-style: italic;
+}
+
+.messageBubbleContainer {
+    margin-bottom: 0.5rem;
+}
+
+.messageBubbleContainer.sent {
+    text-align: right;
+}
+
+.messageBubbleContainer.received {
+    text-align: left;
+}
+
+.messageBubble {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    max-width: 80%;
+    word-break: break-word;
+}
+
+.messageBubble.sent {
+    background-color: #2563eb;
+    color: white;
+}
+
+.messageBubble.received {
+    background-color: #4a5568;
+    color: #e2e8f0;
+}
+
+.messageHeader {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+}
+
+.messageTimestamp {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+.inputContainer {
+    display: flex;
+    position: relative;
+}
+
+.inputWrapper {
+    flex: 1;
+    position: relative;
+}
+
+.input {
+    width: 100%;
+    border: 1px solid;
+    color: white;
+    border-radius: 0.25rem 0 0 0.25rem;
+    padding: 0.25rem 2rem 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.input.error {
+    background-color: #718096;
+    border-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.input.valid {
+    background-color: #4a5568;
+    border-color: #718096;
+}
+
+.input.valid:focus {
+    border-color: #4299e1;
+}
+
+.emojiButton {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+    font-size: 0.875rem;
+}
+
+.emojiButton:hover {
+    color: #f6e05e;
+}
+
+.sendButton {
+    margin-left: 0.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0 0.25rem 0.25rem 0;
+    font-size: 0.875rem;
+}
+
+.sendButton.disabled {
+    background-color: #718096;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.sendButton.enabled {
+    background-color: #2563eb;
+    color: white;
+}
+
+.sendButton.enabled:hover {
+    background-color: #1d4ed8;
+}
