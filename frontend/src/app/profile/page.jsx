@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import styles from './ProfilePage.module.css'
 import { useRouter } from 'next/navigation'
 
 export default function ProfilePage() {
@@ -32,17 +33,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="max-w-xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Your Profile</h1>
-      <p><strong>Email:</strong> {profile.email}</p>
-      <p><strong>Name:</strong> {profile.first_name} {profile.last_name}</p>
-      <p><strong>Date of Birth:</strong> {profile.date_of_birth}</p>
-      <p><strong>Nickname:</strong> {profile.nickname || 'N/A'}</p>
-      <p><strong>About Me:</strong> {profile.about || 'N/A'}</p>
-      <p><strong>Avatar:</strong> {profile.avatar || 'N/A'}</p>
+    <main className={styles.container}>
+      <h1 className={styles.title}>Your Profile</h1>
+      <p className={styles.field}><strong className={styles.label}>Email:</strong> {profile.email}</p>
+      <p className={styles.field}><strong className={styles.label}>Name:</strong> {profile.first_name} {profile.last_name}</p>
+      <p className={styles.field}><strong className={styles.label}>Date of Birth:</strong> {profile.date_of_birth}</p>
+      <p className={styles.field}><strong className={styles.label}>Nickname:</strong> {profile.nickname || 'N/A'}</p>
+      <p className={styles.field}><strong className={styles.label}>About Me:</strong> {profile.about || 'N/A'}</p>
+      <p className={styles.field}><strong className={styles.label}>Avatar:</strong> {profile.avatar || 'N/A'}</p>
 
       <button
-  className="mt-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+  className={styles.logoutButton}
 
   onClick={async () => {
     

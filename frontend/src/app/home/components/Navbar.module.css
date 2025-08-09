@@ -1,331 +1,276 @@
+/* Navbar.module.css */
+
 .navbar {
-    background-color: #1a202c;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #2d3748;
-    position: relative;
+  background-color: #1a202c;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  color: #fff;
 }
 
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .searchContainer {
-    max-width: 42rem;
-    width: 100%;
-    position: relative;
+  position: relative;
+  width: 300px;
 }
 
 .searchInput {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    background-color: #2d3748;
-    border: 1px solid #4a5568;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    color: #f7fafc;
-    placeholder-color: #a0aec0;
-}
-
-.searchInput:focus {
-    outline: none;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #2d3748;
+  border: none;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 0.9rem;
 }
 
 .resultsContainer {
-    position: absolute;
-    left: 0;
-    right: 0;
-    background-color: #2d3748;
-    margin-top: 0.5rem;
-    border-radius: 0.375rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    z-index: 30;
-    border: 1px solid #4a5568;
-    max-height: 16rem;
-    overflow-y: auto;
+  position: absolute;
+  background-color: #2d3748;
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 20;
 }
 
 .resultItem {
-    padding: 0.75rem;
-    cursor: pointer;
-    border-bottom: 1px solid #4a5568;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #e2e8f0;
 }
 
 .resultItem:hover {
-    background-color: #4a5568;
+  background-color: #4a5568;
 }
 
 .resultName {
-    font-weight: 500;
-    color: white;
+  font-weight: bold;
 }
 
 .resultNickname {
-    font-size: 0.875rem;
-    color: #a0aec0;
+  font-size: 0.85rem;
+  color: #a0aec0;
 }
 
 .actionsContainer {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-left: 1rem;
-    position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.actionButton img {
-    width: 1.5rem;
-    height: 1.5rem;
+.actionButtonImg {
+  width: 24px;
+  height: 24px;
+  filter: brightness(1.5);
+  cursor: pointer;
+}
+
+.relative {
+  position: relative;
 }
 
 .notificationsContainer {
-    position: relative;
+  position: relative;
 }
 
 .notificationButton {
-    position: relative;
-    padding: 0.25rem;
-}
-
-.notificationButton img {
-    width: 1.5rem;
-    height: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
 }
 
 .unreadCount {
-    position: absolute;
-    top: -0.25rem;
-    left: -0.25rem;
-    background-color: #ef4444;
-    color: white;
-    font-size: 0.75rem;
-    border-radius: 9999px;
-    height: 1rem;
-    width: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
 }
 
 .notificationsDropdown {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 0.5rem;
-    width: 20rem;
-    background-color: #1a202c;
-    border: 1px solid #4a5568;
-    border-radius: 0.375rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-    z-index: 50;
-    max-height: 24rem;
-    overflow-y: auto;
+  position: absolute;
+  right: 0;
+  top: 2.5rem;
+  width: 320px;
+  background-color: #2d3748;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 30;
+  padding: 0.5rem;
+  color: white;
 }
 
 .dropdownHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dropdownTitle {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: white;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .closeButton {
-    color: #a0aec0;
-}
-
-.closeButton:hover {
-    color: white;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #cbd5e0;
+  cursor: pointer;
 }
 
 .noNotifications {
-    color: #a0aec0;
-    font-size: 0.875rem;
-    padding: 0.5rem 0;
+  text-align: center;
+  padding: 1rem 0;
+  color: #a0aec0;
 }
 
 .notificationsList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .notificationItem {
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #4a5568;
 }
 
 .notificationItem.seen {
-    background-color: #2d3748;
-    border-color: #4a5568;
-}
-
-.notificationItem.unseen {
-    background-color: #2b6cb0;
-    border-color: #3182ce;
+  opacity: 0.6;
 }
 
 .notificationMessage {
-    font-size: 0.875rem;
-    color: white;
-    word-break: break-word;
+  font-size: 0.9rem;
 }
 
 .notificationTimestamp {
-    font-size: 0.75rem;
-    color: #a0aec0;
-    margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #cbd5e0;
 }
 
 .actionButtons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
 }
 
-.acceptButton,
-.rejectButton {
-    font-size: 0.75rem;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    border: none;
-    cursor: pointer;
+.acceptButton, .rejectButton {
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .acceptButton {
-    background-color: #38a169;
-}
-
-.acceptButton:hover {
-    background-color: #2f855a;
+  background-color: #38a169;
+  color: white;
 }
 
 .rejectButton {
-    background-color: #e53e3e;
-}
-
-.rejectButton:hover {
-    background-color: #c53030;
+  background-color: #e53e3e;
+  color: white;
 }
 
 .groupsLink {
-    color: #d1d5db;
-}
-
-.groupsLink:hover {
-    color: white;
+  color: #63b3ed;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 .profileContainer {
-    position: relative;
+  position: relative;
 }
 
 .avatar {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 9999px;
-    border: 1px solid #3182ce;
-    cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  cursor: pointer;
+  border: 2px solid #63b3ed;
 }
 
 .profileDropdown {
-    position: absolute;
-    right: 0;
-    margin-top: 0.5rem;
-    width: 16rem;
-    background-color: #1a202c;
-    border: 1px solid #4a5568;
-    border-radius: 0.375rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-    z-index: 20;
+  position: absolute;
+  right: 0;
+  top: 3.2rem;
+  background-color: #2d3748;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 40;
+  width: 250px;
 }
 
 .profileName {
-    font-weight: 600;
-    color: white;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .profileEmail {
-    font-size: 0.875rem;
-    color: #63b3ed;
-    margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #a0aec0;
+  margin-bottom: 0.5rem;
 }
 
 .privacyContainer {
-    margin-top: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .privacyText {
-    font-size: 0.875rem;
-    color: #d1d5db;
+  font-size: 0.85rem;
 }
 
 .privacyToggle {
-    width: 3rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    border-radius: 9999px;
-    padding: 0.25rem;
-    transition: background-color 0.3s ease-in-out;
-}
-
-.privacyToggle.private {
-    background-color: #ef4444;
-}
-
-.privacyToggle.public {
-    background-color: #22c55e;
+  background-color: #4a5568;
+  width: 40px;
+  height: 20px;
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  padding: 2px;
 }
 
 .privacyToggleIndicator {
-    background-color: white;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 9999px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transform: translateX(0);
-    transition: transform 0.3s ease-in-out;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.2s ease-in-out;
 }
 
-.privacyToggle.private .privacyToggleIndicator {
-    transform: translateX(1.5rem);
+.moveRight {
+  left: 22px;
 }
 
-.profileLink,
-.logoutButton {
-    margin-top: 0.75rem;
-    width: 100%;
-    font-size: 0.875rem;
-    text-align: left;
-}
-
+.logoutButton,
 .profileLink {
-    color: #34d399;
-}
-
-.profileLink:hover {
-    text-decoration: underline;
-}
-
-.logoutButton {
-    color: #f87171;
-}
-
-.logoutButton:hover {
-    text-decoration: underline;
+  width: 100%;
+  margin-top: 0.5rem;
+  background-color: #e53e3e;
+  color: white;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  text-align: center;
 }

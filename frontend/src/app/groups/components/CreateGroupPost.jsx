@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState, forwardRef } from 'react'
-import styles from './CreatGroupPost.module.css'
+import styles from './CreateGroupPost.module.css'
 
 const PostForm = forwardRef(function PostForm(
   { content, setContent, image, setImage, privacy, setPrivacy, handleSubmit, creating },
@@ -34,7 +34,7 @@ const PostForm = forwardRef(function PostForm(
       />
       
       <div className={styles.flexContainer}>
-        <div className="flex-1">
+        <div className={styles['flex-1']}>
           <label className={`${styles.label} ${styles.darkLabel}`}>
             Image
           </label>
@@ -47,7 +47,7 @@ const PostForm = forwardRef(function PostForm(
           />
         </div>
         
-        <div className="flex-1">
+        <div className={styles['flex-1']}>
           <label className={`${styles.label} ${styles.darkLabel}`}>
             Confidentialité
           </label>

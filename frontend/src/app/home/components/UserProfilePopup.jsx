@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import styles from './styles/UserProfilePopup.module.css'
+import styles from './UserProfilePopup.module.css'
 
 export default function UserProfilePopup({
   selectedUser,

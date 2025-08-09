@@ -38,13 +38,24 @@ export function SharedWorkerProvider({ children }) {
     };
   }, []);
 
-  // Function for components to send data
+  // Function for components to send data safely
   const sendMessage = payload => {
     if (!workerRef.current) {
       console.error('Worker not initialized');
       return;
     }
-    workerRef.current.port.postMessage(payload);
+
+    try {
+      // Try to structured-clone by serializing
+      const safePayload = JSON.parse(JSON.stringify(payload));
+      workerRef.current.port.postMessage(safePayload);
+    } catch (err) {
+      console.error(
+        '❌ Payload could not be cloned. Make sure it contains only plain JSON data (no functions, DOM nodes, or circular refs).',
+        err,
+        payload
+      );
+    }
   };
 
   return (

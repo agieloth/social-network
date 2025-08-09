@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import styles from './ChatBox.module.css'
 import EmojiPicker from '../../home/components/Emoji'
 
 export default function ChatBox({ currentUser, recipient, onSendMessage, messages, input, setInput, onClose }) {
@@ -139,11 +140,11 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
   }
 
   return (
-    <div className="w-96 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-3 flex flex-col relative">
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-medium text-white">{recipient.full_name}</span>
+    <div className={styles.chatBox}>
+      <div className={styles.header}>
+        <span className={styles.recipientName}>{recipient.full_name}</span>
         <button
-          className="text-red-400 text-xs hover:text-red-300"
+          className={styles.closeButton}
           onClick={onClose}
         >
           ✖
@@ -151,32 +152,32 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
       </div>
 
       {/* Messages */}
-      <div className="max-h-[60vh] min-h-[300px] overflow-y-auto bg-gray-900 rounded p-2 text-sm text-gray-300 flex-1 mb-2">
+      <div className={styles.messagesContainer}>
         {chatError ? (
-          <div className="text-center p-4">
-            <div className="text-red-400 mb-2">🚫</div>
-            <p className="text-red-400 text-sm">{chatError}</p>
-            <p className="text-gray-500 text-xs mt-2">
+          <div className={styles.errorContainer}>
+            <div className={styles.errorIcon}>🚫</div>
+            <p className={styles.errorText}>{chatError}</p>
+            <p className={styles.errorHint}>
               Pour pouvoir discuter, vous devez vous suivre mutuellement.
             </p>
           </div>
         ) : allMessages.length === 0 ? (
-          <p className="text-gray-500 italic">No messages yet...</p>
+          <p className={styles.noMessages}>No messages yet...</p>
         ) : (
           allMessages.map((m, i) => (
             <div
               key={`${m.from}-${m.to}-${m.timestamp}-${i}`}
-              className={`mb-2 ${m.from === userId ? 'text-right' : 'text-left'}`}
+              className={`${styles.messageBubbleContainer} ${m.from === userId ? styles.sent : styles.received}`}
             >
-              <div className={`inline-block px-3 py-1 rounded-lg max-w-[80%] break-words ${m.from === userId
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-700 text-gray-200'
+              <div className={`${styles.messageBubble} ${m.from === userId
+                ? styles.sent
+                : styles.received
                 }`}>
-                <div className="text-xs opacity-70 mb-1">
+                <div className={styles.messageHeader}>
                   {m.from === userId ? 'Vous' : recipient.full_name}
                 </div>
                 {renderMessageContent(m.content)}
-                <div className="text-xs opacity-70 mt-1">
+                <div className={styles.messageTimestamp}>
                   {new Date(m.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -187,14 +188,14 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
       </div>
 
       {/* Input avec support emoji */}
-      <div className="flex relative">
-        <div className="flex-1 relative">
+      <div className={styles.inputContainer}>
+        <div className={styles.inputWrapper}>
           <input
             ref={inputRef}
             type="text"
-            className={`w-full border text-white rounded-l px-2 py-1 pr-8 text-sm focus:outline-none ${chatError
-              ? 'bg-gray-600 border-gray-500 cursor-not-allowed'
-              : 'bg-gray-700 border-gray-600 focus:border-blue-500'
+            className={`${styles.input} ${chatError
+              ? styles.error
+              : styles.valid
               }`}
             value={input}
             onChange={(e) => !chatError && setInput(e.target.value)}
@@ -208,7 +209,7 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-yellow-400 text-sm"
+              className={styles.emojiButton}
               title="Ajouter un emoji"
             >
               😊
@@ -217,9 +218,9 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
         </div>
 
         <button
-          className={`ml-2 px-3 rounded-r text-sm ${chatError || !input.trim()
-            ? 'bg-gray-600 cursor-not-allowed opacity-50'
-            : 'bg-blue-600 hover:bg-blue-700 text-white'
+          className={`${styles.sendButton} ${chatError || !input.trim()
+            ? styles.disabled
+            : styles.enabled
             }`}
           onClick={handleSend}
           disabled={!!chatError || !input.trim()}

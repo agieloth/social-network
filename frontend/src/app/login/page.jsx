@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -57,14 +58,14 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-sm bg-white p-6 rounded-xl shadow-md">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Login</h1>
-        <form onSubmit={handleLogin} className="space-y-4">
+    <main className={styles.container}>
+      <div className={styles.formContainer}>
+        <h1 className={styles.title}>Login</h1>
+        <form onSubmit={handleLogin} className={styles.form}>
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-500"
+            className={styles.input}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -72,27 +73,27 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 placeholder-gray-500"
+            className={styles.input}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-200"
+            className={styles.button}
           >
             Login
           </button>
 
-          <p className="text-center text-sm mt-4 text-gray-600">
+          <p className={styles.linkContainer}>
             Pas encore de compte ?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href="/register" className={styles.link}>
               Créez-en un ici
             </Link>
           </p>
         </form>
         {message && (
-          <p className="mt-4 text-sm text-center text-red-600">{message}</p>
+          <p className={styles.message}>{message}</p>
         )}
       </div>
     </main>

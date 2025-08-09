@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { SharedWorkerProvider } from "../contexts/SharedWorkerContext";
 import "./globals.css";
+import AuthProvider from "../contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +24,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SharedWorkerProvider>
-        {children}  
-        </SharedWorkerProvider>
+        <AuthProvider>
+          <SharedWorkerProvider>
+            {children}  
+          </SharedWorkerProvider>
+        </AuthProvider>
       </body>
     </html>
   );

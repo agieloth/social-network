@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "./components/Navbar";
+import { Navbar } from "./components/Navbar";
 import PostForm from "./components/PostForm";
 import MessageSidebar from "../messages/components/MessageSidebar";
 import ChatBox from "../messages/components/ChatBox";
 import Post from './components/Post'
 import styles from './HomePage.module.css'
+import { useSharedWorker } from '../../contexts/SharedWorkerContext';
 
 export default function HomePage() {
+  const { sendMessage, messages, isConnected } = useSharedWorker();
   // States for posts, user, UI, etc.
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,84 +30,11 @@ export default function HomePage() {
   const [chatUsers, setChatUsers] = useState([]);
   const [openChats, setOpenChats] = useState([]);
   const [showPostForm, setShowPostForm] = useState(false)
-  const [notifications, setNotifications] = useState([])
-  const [realtimeNotification, setRealtimeNotification] = useState(null)
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [input, setInput] = useState({});
 
   const removeNotificationCallback = useRef(null);
 
-  // --- SharedWorker related ---
-  const workerRef = useRef(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState({});
-
   const router = useRouter();
-
-  // Setup SharedWorker connection once user is set
-  useEffect(() => {
-    if (!user?.ID) return;
-
-    if (!workerRef.current) {
-      workerRef.current = new SharedWorker('/sharedWorker.js');
-      const port = workerRef.current.port;
-
-      port.start();
-      port.postMessage({ type: "INIT", userId: user.ID });
-
-      port.onmessage = (event) => {
-        const { type, message } = event.data;
-        if (type === "message"  || type ===  "private") {
-          setMessages((prev) => [...prev, message]);
-        }
-
-        if (type === "notification" || type === "follow_request" ||
-          type === "follow_request_response" || type === "follow_request_cancelled") {
-          setNotifications(prev => [message, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          setRealtimeNotification(message);
-        }
-
-        if (type === "status" || type === "error") {
-          console.log(`[Worker]: ${message}`);
-        }
-      };
-    }
-
-    // Cleanup on unmount or user change
-    return () => {
-      workerRef.current?.port?.close();
-      workerRef.current = null;
-    };
-  }, [user?.ID]);
-
-  // Send chat message through SharedWorker
-  const sendMessage = useCallback((chatMsg) => {
-    if (!workerRef.current) {
-      console.error("SharedWorker not initialized.");
-      return;
-    }
-
-    workerRef.current.port.postMessage({ type: "SEND", message: chatMsg });
-
-    // Optimistic update for sent message:
-    const messageWithId = {
-      ...chatMsg,
-      uniqueId: `${chatMsg.from}-${chatMsg.to}-${chatMsg.timestamp}-${Date.now()}-sent`
-    };
-
-    setMessages(prev => {
-      // Avoid duplicates if very close timestamp
-      const exists = prev.some(m =>
-        m.from === chatMsg.from &&
-        m.to === chatMsg.to &&
-        m.content === chatMsg.content &&
-        Math.abs(new Date(m.timestamp) - new Date(chatMsg.timestamp)) < 1000
-      );
-
-      if (exists) return prev;
-      return [...prev, messageWithId];
-    });
-  }, []);
 
   const handleNotificationRemoved = useCallback((removeCallback) => {
     removeNotificationCallback.current = removeCallback;
@@ -257,11 +186,6 @@ export default function HomePage() {
 
   const handleLogout = async () => {
     try {
-      if (workerRef.current) {
-        workerRef.current.port.close();
-        workerRef.current = null;
-      }
-
       const res = await fetch("http://localhost:8080/api/logout", {
         method: "POST",
         credentials: "include",
@@ -288,7 +212,6 @@ export default function HomePage() {
         results={results}
         openMessages={openMessages}
         togglePostForm={togglePostForm}
-        realtimeNotification={realtimeNotification}
         fetchChatUsers={fetchChatUsers}
         onNotificationRemoved={onNotificationRemoved}
         fetchUserById={fetchUserById}
@@ -325,7 +248,7 @@ export default function HomePage() {
         )}
       </div>
 
-      
+
       {posts === null ? (
         <p className={styles.noPosts}>Aucun post à afficher.</p>
       ) : (
@@ -342,8 +265,10 @@ export default function HomePage() {
             messages={messages}
             input={input[u.id || u.ID] || ''}
             setInput={(val) => setInput(prev => ({ ...prev, [u.id || u.ID]: val }))}
-            onSendMessage={sendMessage}
+            onSendMessage={(chatMsg) => sendMessage({ type: "SEND", message: chatMsg, userId: user.ID })}
             onClose={() => setOpenChats(prev => prev.filter(c => (c.id || c.ID) !== (u.id || u.ID)))}
+            isConnected={isConnected}
+            userId={user.ID}
           />
         ))}
       </div>
