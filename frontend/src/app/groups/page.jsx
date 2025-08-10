@@ -1,22 +1,62 @@
-//src/app/groups/page.js
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import GroupList from './components/GroupList'
 import CreateGroupModal from './components/CreateGroupModal'
 import { useAuth } from '../../contexts/AuthContext'
 import { redirect } from 'next/navigation'
-export default function GroupsPage() {
-  const {user} = useAuth()
-  const [showCreateModal, setShowCreateModal] = useState(false)
 
-  if (!user) {
+function LoadingState() {
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
+        <div className="animate-pulse space-y-4">
+          <div className="h-12 bg-gray-800 rounded w-1/2 mx-auto"></div>
+          <div className="h-6 bg-gray-800 rounded w-1/3 mx-auto"></div>
+          <div className="h-40 bg-gray-800 rounded mt-8"></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ErrorState({ error }) {
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24 text-red-500">
+        {error}
+      </div>
+    </div>
+  )
+}
+
+export default function GroupsPage() {
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const { user } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    // Simulate loading completion
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!user && !loading) {
       redirect("/login")
     }
+  }, [user, loading])
+
+  if (loading || !user) return <LoadingState />
+  if (error) return <ErrorState error={error} />
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-  
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24"> {/* Added pt-24 to account for navbar height */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
         {/* Header with animated gradient */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-4">
@@ -26,6 +66,7 @@ export default function GroupsPage() {
             Connect, share, and grow with like-minded people
           </p>
         </div>
+        
         {/* Action Bar */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <button
@@ -47,11 +88,13 @@ export default function GroupsPage() {
             Create New Group
           </button>
         </div>
+        
         {/* Group List */}
         <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700/50 p-6 shadow-2xl">
           <GroupList />
         </div>
       </div>
+      
       {/* Create Group Modal */}
       {showCreateModal && (
         <CreateGroupModal
