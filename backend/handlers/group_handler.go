@@ -91,7 +91,7 @@ func (h *GroupHandler) GroupRouterHandler(w http.ResponseWriter, r *http.Request
 	case suffix == "membership/accept" && method == http.MethodPost:
 		h.AcceptGroupInviteHandler(w, r)
 
-	case suffix == "membership/invite" && method == http.MethodPost:
+	case suffix == "invite" && method == http.MethodPost:
 		h.InviteToGroupHandler(w, r)
 	case suffix == "membership/approve" && method == http.MethodPost:
 		h.ApproveRequestHandler(w, r)
@@ -99,7 +99,7 @@ func (h *GroupHandler) GroupRouterHandler(w http.ResponseWriter, r *http.Request
 	case suffix == "membership/decline" && method == http.MethodPost:
 		h.DeclineRequestHandler(w, r)
 
-	case suffix == "non-members":
+	case suffix == "invitable_members":
 		h.GetNonGroupMembersHandler(w, r)
 
 	case suffix == "chat" && method == http.MethodGet:
@@ -469,7 +469,7 @@ func (h *GroupHandler) DeclineRequestHandler(w http.ResponseWriter, r *http.Requ
 
 func (h *GroupHandler) GetNonGroupMembersHandler(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
-	groupIDStr = strings.TrimSuffix(groupIDStr, "/non-members")
+	groupIDStr = strings.TrimSuffix(groupIDStr, "/invitable_members")
 
 	groupID, err := strconv.Atoi(groupIDStr)
 	if err != nil {

@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, redirect } from 'next/navigation'
 import PendingRequests from '../components/PendingRequests'
 import PostForm from '../../home/components/PostForm'
 import { use } from 'react'
@@ -18,6 +18,11 @@ export default function GroupDetailPage({ params }) {
   const [showPostForm, setShowPostForm] = useState(false)
   const [showEventForm, setShowEventForm] = useState(false)
 
+  // Add to existing state variables
+  const [showInviteForm, setShowInviteForm] = useState(false)
+  const [invitableMembers, setInvitableMembers] = useState([])
+  const [invitingMemberId, setInvitingMemberId] = useState(null) // Track which member is being invited
+
   // Content state
   const [posts, setPosts] = useState([])
   const [events, setEvents] = useState([])
@@ -31,23 +36,23 @@ export default function GroupDetailPage({ params }) {
   const [commentInputs, setCommentInputs] = useState({})
   const [loadingComments, setLoadingComments] = useState({})
   const [postingComment, setPostingComment] = useState({})
-  
+
   // Chat state
   const [groupChatInput, setGroupChatInput] = useState('')
   const [groupChatMessages, setGroupChatMessages] = useState([])
   const [userId, setUserId] = useState(null)
-  
+
   // auth 
-  const {user} = useAuth()
+  const { user } = useAuth()
   const { sendWorkerMessage } = useSharedWorker()
   const router = useRouter()
 
   if (!user) {
-      router.push("/login");
-      return
-    }
+    redirect("/login");
+    return
+  }
 
-    useEffect(() => {
+  useEffect(() => {
     console.log("Current user:", user);
     if (user?.ID) {
       console.log("Initializing SharedWorker with user ID:", user.ID);
@@ -67,29 +72,6 @@ export default function GroupDetailPage({ params }) {
   const fileInputRef = useRef()
   const [chatUsers, setChatUsers] = useState([])
   const [realtimeNotification, setRealtimeNotification] = useState(null)
-
-  // Shared Worker Context
-
-  // Get current user ID
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const res = await fetch('/api/auth/me', {
-          credentials: 'include'
-        })
-        if (res.ok) {
-          const user = await res.json()
-          setUserId(user.id)
-        } else {
-          console.error('Failed to fetch user ID')
-        }
-      } catch (err) {
-        console.error('Error fetching user ID:', err)
-      }
-    }
-
-    fetchUserId()
-  }, [])
 
   // Handle incoming messages from the shared worker
   useEffect(() => {
@@ -148,6 +130,49 @@ export default function GroupDetailPage({ params }) {
     }])
 
     setGroupChatInput('')
+  }
+
+  const fetchInvitableMembers = async () => {
+  try {
+    const res = await fetch(`/api/groups/${groupId}/invitable_members`, {
+      credentials: 'include'
+    })
+    if (!res.ok) throw new Error('Failed to fetch invitable members')
+    const data = await res.json()
+    setInvitableMembers(data)
+  } catch (err) {
+    console.error('Error fetching invitable members:', err)
+  }
+}
+
+ const handleInviteMember = async (memberId) => {
+  setInvitingMemberId(memberId)
+  try {
+    const res = await fetch(`/api/groups/${groupId}/invite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_id: memberId }), // Note singular member_id instead of member_ids
+      credentials: 'include'
+    })
+    alert(res.status)
+    if (!res.ok) throw new Error('Failed to send invitation')
+    
+    // Remove the invited member from the list
+    setInvitableMembers(prev => prev.filter(member => member.id !== memberId))
+  } catch (err) {
+    console.error('Error inviting member:', err)
+  } finally {
+    setInvitingMemberId(null)
+  }
+}
+
+  const toggleInviteForm = () => {
+    setShowInviteForm(prev => {
+      if (!prev) fetchInvitableMembers()
+      return !prev
+    })
   }
 
   // Handle key press in chat input
@@ -525,6 +550,58 @@ export default function GroupDetailPage({ params }) {
         </div>
       )}
 
+     {showInviteForm && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
+      <h2 className="text-xl font-bold text-white mb-4">Invite Members</h2>
+      
+      {invitableMembers && invitableMembers.length > 0 ? (
+        <div className="space-y-4">
+          <div className="max-h-96 overflow-y-auto">
+            {invitableMembers.map(member => (
+              <div key={member.id} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                    {member.username.charAt(0)}
+                  </div>
+                  <span className="text-white">{member.name}</span>
+                </div>
+                <button
+                  onClick={() => handleInviteMember(member.id)}
+                  disabled={invitingMemberId === member.id}
+                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {invitingMemberId === member.id ? 'Inviting...' : 'Invite'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowInviteForm(false)}
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-gray-400">No members available to invite</p>
+          <button
+            onClick={() => setShowInviteForm(false)}
+            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
       <div className="max-w-4xl mx-auto p-4 pt-24">
         <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 mb-6 border border-gray-700/50">
           <h1 className="text-3xl font-bold text-white mb-2">{group.title}</h1>
@@ -580,6 +657,15 @@ export default function GroupDetailPage({ params }) {
               Pending Requests
             </button>
           )}
+
+          {group.is_creator && (
+            <button
+              onClick={() => setActiveTab('members')}
+              className={`px-4 py-2 ${activeTab === 'members' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-gray-400 hover:text-white'}`}
+            >
+              Members
+            </button>
+          )}
         </div>
 
         {group.is_member || group.is_creator ? (
@@ -606,6 +692,15 @@ export default function GroupDetailPage({ params }) {
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                 <PendingRequests groupId={group.id} />
               </div>
+            )}
+
+            {activeTab === 'members' && (
+              <button
+                onClick={toggleInviteForm}
+                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Invite Members
+              </button>
             )}
 
             {activeTab === 'posts' && (
