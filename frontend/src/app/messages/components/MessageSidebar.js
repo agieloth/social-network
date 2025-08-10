@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 
 export default function MessageSidebar({
-  chatUsers,
+  chatUsers = [], // Default empty array
   showMessages,
   setShowMessages,
   openChat,
@@ -13,9 +13,14 @@ export default function MessageSidebar({
   // Référence pour l'intervalle de polling
   const pollingInterval = useRef(null);
 
-  // Filtrer les utilisateurs qui peuvent discuter
-  const chatableUsers = chatUsers.filter(u => u.id !== currentUserId && u.can_chat)
-  const nonChatableUsers = chatUsers.filter(u => u.id !== currentUserId && !u.can_chat)
+  // Filtrer les utilisateurs qui peuvent discuter avec vérification de null
+  const chatableUsers = chatUsers?.filter(u => 
+    u?.id !== currentUserId && u?.can_chat
+  ) || []
+  
+  const nonChatableUsers = chatUsers?.filter(u => 
+    u?.id !== currentUserId && !u?.can_chat
+  ) || []
 
   // Polling automatique quand la sidebar des messages est ouverte
   useEffect(() => {
@@ -45,7 +50,7 @@ export default function MessageSidebar({
 
   // Fonction pour gérer le clic sur un utilisateur non-chatable
   const handleNonChatableUserClick = (user) => {
-    alert(`Vous ne pouvez pas discuter avec ${user.full_name}. Vous devez vous suivre mutuellement pour pouvoir discuter.`);
+    alert(`Vous ne pouvez pas discuter avec ${user?.full_name || 'cet utilisateur'}. Vous devez vous suivre mutuellement pour pouvoir discuter.`);
   }
 
   // Fonction pour forcer le rafraîchissement manuel

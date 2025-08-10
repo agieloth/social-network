@@ -31,15 +31,21 @@ export default function GroupDetailPage({ params }) {
   const [commentInputs, setCommentInputs] = useState({})
   const [loadingComments, setLoadingComments] = useState({})
   const [postingComment, setPostingComment] = useState({})
-
+  
   // Chat state
   const [groupChatInput, setGroupChatInput] = useState('')
   const [groupChatMessages, setGroupChatMessages] = useState([])
   const [userId, setUserId] = useState(null)
-
+  
   // auth 
   const {user} = useAuth()
   const { sendWorkerMessage } = useSharedWorker()
+  const router = useRouter()
+
+  if (!user) {
+      router.push("/login");
+      return
+    }
 
     useEffect(() => {
     console.log("Current user:", user);
@@ -56,8 +62,8 @@ export default function GroupDetailPage({ params }) {
     eventDate: ''
   })
 
+
   // Other hooks and refs
-  const router = useRouter()
   const fileInputRef = useRef()
   const [chatUsers, setChatUsers] = useState([])
   const [realtimeNotification, setRealtimeNotification] = useState(null)

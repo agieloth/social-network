@@ -7,6 +7,7 @@ import MessageSidebar from "../messages/components/MessageSidebar";
 import ChatBox from "../messages/components/ChatBox";
 import Post from './components/Post'
 import styles from './HomePage.module.css'
+import { useMessageSidebar } from "../../contexts/MessageSideBarContext";
 
 export default function HomePage() {
   // States for posts, user, UI, etc.
@@ -22,14 +23,14 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
-
-  const [showMessages, setShowMessages] = useState(false);
-  const [chatUsers, setChatUsers] = useState([]);
   const [openChats, setOpenChats] = useState([]);
   const [showPostForm, setShowPostForm] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [realtimeNotification, setRealtimeNotification] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0);
+  const [chatUsers, setChatUsers] = useState([])
+
+  const { showMessages, setShowMessages } = useMessageSidebar()
 
   const removeNotificationCallback = useRef(null);
 
@@ -53,7 +54,7 @@ export default function HomePage() {
 
       port.onmessage = (event) => {
         const { type, message } = event.data;
-        if (type === "message"  || type ===  "private") {
+        if (type === "message" || type === "private") {
           setMessages((prev) => [...prev, message]);
         }
 
@@ -137,16 +138,16 @@ export default function HomePage() {
   }, []);
 
   const fetchChatUsers = async () => {
-    // try {
-    //   const res = await fetch("http://localhost:8080/api/chat-users", {
-    //     credentials: "include",
-    //   });
-    //   if (!res.ok) throw new Error("Failed to fetch users");
-    //   const data = await res.json();
-    //   //setChatUsers(data);
-    // } catch (err) {
-    //   console.error("Error fetching users:", err);
-    // }
+    try {
+      const res = await fetch("http://localhost:8080/api/chat-users", {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setChatUsers(data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
   };
 
   const fetchUser = async () => {
@@ -282,12 +283,13 @@ export default function HomePage() {
     <div className={styles.pageContainer}>
 
       {showMessages && user && (
+        // In your layout or page component
         <MessageSidebar
           chatUsers={chatUsers}
           showMessages={showMessages}
           setShowMessages={setShowMessages}
           openChat={openChat}
-          currentUserId={user.ID}
+          currentUserId={user?.ID}
           fetchChatUsers={fetchChatUsers}
         />
       )}

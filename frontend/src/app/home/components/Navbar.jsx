@@ -7,11 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useSharedWorker } from '../../../contexts/SharedWorkerContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PostForm from '../../../app/home/components/PostForm';
+import { useMessageSidebar } from '../../../contexts/MessageSideBarContext';
 
 export function Navbar() {
   const { user } = useAuth();
   const router = useRouter();
 
+  
   // Post Form State
   const [showPostForm, setShowPostForm] = useState(false);
   const [content, setContent] = useState('');
@@ -23,7 +25,7 @@ export function Navbar() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const fileInputRef = useRef();
-
+  
   // Existing Navbar State
   const [showProfile, setShowProfile] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -33,7 +35,8 @@ export function Navbar() {
   const notificationsRef = useRef(null);
   const notificationButtonRef = useRef(null);
   const { workerMessages, sendWorkerMessage } = useSharedWorker();
-
+  const { setShowMessages } = useMessageSidebar()
+  const openMessages = () => setShowMessages(true);
   // Initialize SharedWorker when user is available
   useEffect(() => {
     console.log("Current user:", user);
@@ -42,7 +45,7 @@ export function Navbar() {
       sendWorkerMessage({ type: 'INIT', userId: user.ID });
     }
   }, [user, sendWorkerMessage]);
-
+  
   const handleSearch = async (e) => {
     const value = e.target.value;
     setSearch(value);
@@ -62,44 +65,44 @@ export function Navbar() {
       setResults([]);
     }
   };
-
+  
   const handleSubmit = async (e, selectedRecipientIds = []) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setCreating(true);
-
+    
     const formData = new FormData();
     formData.append("content", content);
     formData.append("privacy", privacy);
     if (image) {
       formData.append("image", image);
     }
-
+    
     try {
       let finalRecipientIds = [];
 
       if (privacy === "custom") {
         finalRecipientIds = selectedRecipientIds;
       }
-
+      
       finalRecipientIds.forEach(id => {
         formData.append("recipient_ids", id);
       });
-
+      
       const res = await fetch("http://localhost:8080/api/posts", {
         method: "POST",
         body: formData,
         credentials: "include",
       });
-
+      
       if (!res.ok) throw new Error("Erreur lors de la publication");
-
+      
       setSuccess("✅ Post publié !");
       setContent("");
       setImage(null);
       setPrivacy("public");
-
+      
       if (fileInputRef.current) {
         fileInputRef.current.value = null;
       }
@@ -109,7 +112,7 @@ export function Navbar() {
       setCreating(false);
     }
   };
-
+  
   const togglePostForm = () => {
     setShowPostForm(prev => !prev);
     // Reset form state when opening
@@ -118,13 +121,13 @@ export function Navbar() {
       setSuccess("");
     }
   };
-
+  
   // Handle WebSocket messages from SharedWorker
   useEffect(() => {
     const handleWebSocketMessage = (message) => {
       handleRealtimeNotification(message)
     }
-
+    
     workerMessages.forEach(msg => {
       if (msg.type === 'message' && msg.data) {
         // Handle WebSocket data from server
@@ -160,7 +163,7 @@ export function Navbar() {
       return updated;
     });
   }
-
+  
   const handleLogout = async () => {
     try {
       await fetch('/api/logout', { credentials: 'include', method: 'POST' });
@@ -169,17 +172,15 @@ export function Navbar() {
       console.error('Logout error:', err);
     }
   };
-
-  const openMessages = () => setShowMessages(true);
-
+  
   const fetchNotifications = async () => {
     try {
       const res = await fetch("http://localhost:8080/api/notifications", { credentials: 'include' });
       const data = await res.json();
-
+      
       const uniqueNotifs = [];
       const seenKeys = new Set();
-
+      
       for (const notif of data) {
         const key = `${notif.sender_id}-${notif.message}-${notif.type}`;
         if (!seenKeys.has(key)) {
@@ -187,7 +188,7 @@ export function Navbar() {
           uniqueNotifs.push(notif);
         }
       }
-
+      
       setNotifications(uniqueNotifs);
       setUnreadCount(uniqueNotifs.filter(n => !n.seen).length);
     } catch (err) {
@@ -221,14 +222,14 @@ export function Navbar() {
         body: JSON.stringify({ sender_id: senderId }),
         credentials: 'include',
       });
-
+      
       await fetch('/api/notifications/seen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notification_id: notifId }),
         credentials: 'include',
       });
-
+      
       await fetch('/api/notifications/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -240,7 +241,7 @@ export function Navbar() {
       console.error('Error accepting follow:', err);
     }
   };
-
+  
   const handleReject = async (notifId, senderId) => {
     try {
       const [rejectRes, seenRes, deleteRes] = await Promise.all([
@@ -273,7 +274,7 @@ export function Navbar() {
       console.error('Error rejecting follow:', err);
     }
   };
-
+  
   const handleApprove = async (notifId, userId, groupId) => {
     try {
       const res = await fetch(`/api/groups/${groupId}/membership/approve`, {
@@ -282,7 +283,7 @@ export function Navbar() {
         body: JSON.stringify({ user_id: userId }),
         credentials: 'include'
       })
-
+      
       if (res.ok) {
         await fetch('/api/notifications/seen', {
           method: 'POST',
@@ -290,7 +291,7 @@ export function Navbar() {
           body: JSON.stringify({ notification_id: notifId }),
           credentials: 'include',
         });
-
+        
         await fetch('/api/notifications/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -303,7 +304,7 @@ export function Navbar() {
       console.error('Error approving request:', err)
     }
   }
-
+  
   const handleDecline = async (notifId, userId, groupId) => {
     try {
       const res = await fetch(`/api/groups/${groupId}/membership/decline`, {
@@ -319,7 +320,7 @@ export function Navbar() {
           body: JSON.stringify({ notification_id: notifId }),
           credentials: 'include',
         });
-
+        
         await fetch('/api/notifications/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -333,8 +334,8 @@ export function Navbar() {
     }
   }
 
-    const handleVote = async (eventId, groupId, response, notifId) => {
-      
+  const handleVote = async (eventId, groupId, response, notifId) => {
+    
     try {
       const res = await fetch(`/api/groups/${groupId}/events/${eventId}/vote`, {
         method: 'POST',
@@ -344,27 +345,27 @@ export function Navbar() {
         body: JSON.stringify({ response }),
         credentials: 'include'
       });
-
+      
       if (!res.ok) throw new Error('Failed to submit response');
       await fetch('/api/notifications/seen', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ notification_id: notifId }),
-          credentials: 'include',
-        });
-
-        await fetch('/api/notifications/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ notification_id: notifId }),
-          credentials: 'include',
-        });
-        setNotifications(prev => prev.filter(n => n.id !== notifId));
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      
+      await fetch('/api/notifications/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
     } catch (err) {
       console.error('Error submitting response:', err);
     }
   };
-
+  
   const togglePrivacy = async () => {
     try {
       const res = await fetch('/api/user/toggle-privacy', {
@@ -380,24 +381,27 @@ export function Navbar() {
       console.error('Error changing privacy:', err);
     }
   };
-
+  
   // Handle click outside notifications dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationsRef.current &&
         !notificationsRef.current.contains(event.target) &&
         !notificationButtonRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Initial notifications fetch
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+          setShowNotifications(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+    
+    // Initial notifications fetch
+    useEffect(() => {
+      fetchNotifications();
+    }, []);
+    if (!user) {
+      return
+    }
 
   return (
     <>
@@ -411,7 +415,7 @@ export function Navbar() {
               onChange={handleSearch}
               value={search}
               className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-100 placeholder-gray-400 focus:outline-none"
-            />
+              />
             {results && results.length > 0 && (
               <div className="absolute left-0 right-0 bg-gray-800 mt-2 rounded-md shadow-lg z-30 border border-gray-700 max-h-64 overflow-y-auto">
                 {results.map((user) => (
@@ -533,7 +537,7 @@ export function Navbar() {
                               </button>
                             </div>
                           )}
-                           {notif.type === 'group_event_created' && (
+                          {notif.type === 'group_event_created' && (
                             <div className="flex gap-2 mt-2">
                               <button
                                 onClick={(e) => {

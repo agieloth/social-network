@@ -1,12 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [error, setError] = useState('')
-  const router = useRouter()
+  const router = useRouter();
+  const {user} = useAuth();
+
+  if (!user) {
+      redirect("/login");
+    }
 
   useEffect(() => {
     fetch('http://localhost:8080/api/profile', {
@@ -58,7 +64,6 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error('Logout error:', error);
-      alert('Network error during logout');
     }
   }}
 >

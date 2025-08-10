@@ -1,8 +1,11 @@
+// layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import { SharedWorkerProvider } from "../contexts/SharedWorkerContext";
 import { NavbarProvider } from "../contexts/NavBarContext";
-import {Navbar} from "./home/components/Navbar"
+import { Navbar } from "./home/components/Navbar"
 import AuthProvider from "../contexts/AuthContext"
+import { MessageSidebarProvider } from "../contexts/MessageSideBarContext";
+import MessageSidebar from "./messages/components/MessageSidebar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,16 +26,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-        <SharedWorkerProvider>
-          <NavbarProvider>
-            <Navbar />
-            {children}
-          </NavbarProvider>
-        </SharedWorkerProvider>
+          <SharedWorkerProvider>
+            <NavbarProvider>
+              <MessageSidebarProvider>
+                <Navbar />
+                <MessageSidebar />
+                {children}
+              </MessageSidebarProvider>
+            </NavbarProvider>
+          </SharedWorkerProvider>
         </AuthProvider>
       </body>
     </html>

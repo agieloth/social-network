@@ -8,10 +8,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    // 👀 Check if user is already authenticated
     const checkAuth = async () => {
       try {
         const res = await fetch('http://localhost:8080/api/profile', {
@@ -19,40 +19,44 @@ export default function LoginPage() {
         })
 
         if (res.ok) {
-          router.push('/home') // ✅ Already logged in, redirect to home
+          router.push('/') // Use router.push instead of redirect
         }
       } catch (err) {
-        // Not logged in or network error — stay on login
         console.error('Auth check failed:', err)
       }
     }
 
     checkAuth()
-  }, [])
+  }, [router]) // Add router to dependencies
 
   const handleLogin = async (e) => {
     e.preventDefault()
+    setMessage('')
+    setIsLoading(true)
 
     try {
       const res = await fetch('http://localhost:8080/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        credentials: 'include', // Important for cookies
         body: JSON.stringify({ email, password }),
       })
 
+      const data = await res.json()
+
       if (res.ok) {
-        const userData = await res.json()
-        localStorage.setItem('user', JSON.stringify(userData))
         setMessage('✅ Login successful!')
-        router.push('/home')
+        // Remove localStorage.setItem unless you specifically need it
+        // The session cookie should be enough
+        router.push('/') // Navigate after successful login
       } else {
-        const text = await res.text()
-        setMessage(`❌ ${text}`)
+        setMessage(data.message || `❌ Login failed (${res.status})`)
       }
     } catch (err) {
-      console.error(err)
-      setMessage('❌ Network error')
+      console.error('Login error:', err)
+      setMessage('❌ Connection error - please try again')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -79,20 +83,23 @@ export default function LoginPage() {
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-200"
+            disabled={isLoading}
+            className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
 
           <p className="text-center text-sm mt-4 text-gray-600">
-            Pas encore de compte ?{' '}
+            Don't have an account?{' '}
             <Link href="/register" className="text-blue-600 hover:underline">
-              Créez-en un ici
+              Register here
             </Link>
           </p>
         </form>
         {message && (
-          <p className="mt-4 text-sm text-center text-red-600">{message}</p>
+          <p className={`mt-4 text-sm text-center ${message.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+            {message}
+          </p>
         )}
       </div>
     </main>
