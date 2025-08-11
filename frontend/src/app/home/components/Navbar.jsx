@@ -365,6 +365,75 @@ export function Navbar() {
       console.error('Error submitting response:', err);
     }
   };
+
+  const handleInviteAccept = async (groupId, notifId) => {
+  try {
+    // First accept the invitation (this will update the membership status to 'accepted')
+    const res = await fetch(`/api/groups/${groupId}/membership/accept`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (res.ok) {
+      // Mark notification as seen and delete it
+      await fetch('/api/notifications/seen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      
+      await fetch('/api/notifications/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      
+      // Remove the notification from state
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+    } else {
+      console.error('Failed to accept invitation');
+    }
+  } catch (err) {
+    console.error('Error accepting group invitation:', err);
+  }
+};
+
+const handleInviteDecline = async (groupId, notifId) => {
+  try {
+    // First decline the invitation (this will remove the membership record)
+    const res = await fetch(`/api/groups/${groupId}/membership/refuse`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (res.ok) {
+      // Mark notification as seen and delete it
+      await fetch('/api/notifications/seen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      
+      await fetch('/api/notifications/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notifId }),
+        credentials: 'include',
+      });
+      
+      // Remove the notification from state
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+    } else {
+      alert(res.status)
+      console.error('Failed to decline invitation');
+    }
+  } catch (err) {
+    console.error('Error declining group invitation:', err);
+  }
+};
   
   const togglePrivacy = async () => {
     try {
@@ -556,6 +625,28 @@ export function Navbar() {
                                 className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
                               >
                                 Not Going
+                              </button>
+                            </div>
+                          )}
+                          {notif.type === 'group_invitation' && (
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleInviteAccept(notif.GroupId, notif.id)
+                                }}
+                                className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleInviteDecline(notif.GroupId, notif.id)
+                                }}
+                                className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+                              >
+                                Decline
                               </button>
                             </div>
                           )}

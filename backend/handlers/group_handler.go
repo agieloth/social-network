@@ -90,6 +90,8 @@ func (h *GroupHandler) GroupRouterHandler(w http.ResponseWriter, r *http.Request
 
 	case suffix == "membership/accept" && method == http.MethodPost:
 		h.AcceptGroupInviteHandler(w, r)
+	case suffix == "membership/refuse" && method == http.MethodPost:
+		h.RefuseGroupInviteHandler(w, r)
 
 	case suffix == "invite" && method == http.MethodPost:
 		h.InviteToGroupHandler(w, r)
@@ -353,6 +355,37 @@ func (h *GroupHandler) AcceptGroupInviteHandler(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *GroupHandler) RefuseGroupInviteHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := h.Session.GetUserIDFromSession(w, r)
+	if !ok || userID == 0 {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	groupIDStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
+	groupIDStr = strings.TrimSuffix(groupIDStr, "/membership/refuse")
+	groupID, err := strconv.Atoi(groupIDStr)
+	if err != nil {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.Service.RefuseInvite(groupID, userID)
+	if err != nil {
+		switch err.Error() {
+		case "membership not found":
+			http.Error(w, err.Error(), http.StatusNotFound)
+		case "user is not invited":
+			http.Error(w, err.Error(), http.StatusForbidden)
+		default:
+			http.Error(w, "Failed to accept invitation", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func (h *GroupHandler) InviteToGroupHandler(w http.ResponseWriter, r *http.Request) {
 	creatorID, ok := h.Session.GetUserIDFromSession(w, r)
 	if !ok || creatorID == 0 {
@@ -375,7 +408,7 @@ func (h *GroupHandler) InviteToGroupHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = h.Service.InviteUserToGroup(groupID, creatorID, invite)
+	notif, err := h.Service.InviteUserToGroup(groupID, creatorID, invite)
 	if err != nil {
 		switch err.Error() {
 		case "group not found":
@@ -389,6 +422,7 @@ func (h *GroupHandler) InviteToGroupHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	h.Hub.SendNotification(notif, invite.UserID)
 }
 
 func (h *GroupHandler) ApproveRequestHandler(w http.ResponseWriter, r *http.Request) {

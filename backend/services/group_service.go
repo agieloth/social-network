@@ -100,22 +100,68 @@ func (s *GroupService) AcceptInvite(groupID, userID int) error {
 	return nil
 }
 
-func (s *GroupService) InviteUserToGroup(groupID int, creatorID int, invite models.InviteRequest) error {
-	dbCreatorID, err := s.Repo.GetGroupCreatorID(groupID)
+func (s *GroupService) RefuseInvite(groupID, userID int) error {
+	status, err := s.Repo.GetMembershipStatus(groupID, userID)
 	if err != nil {
-		return fmt.Errorf("group not found")
+		return fmt.Errorf("membership not found")
 	}
 
-	if dbCreatorID != creatorID {
-		return fmt.Errorf("not authorized")
+	if status != "invited" {
+		return fmt.Errorf("user is not invited")
 	}
 
-	err = s.Repo.UpsertGroupInvitation(groupID, invite.UserID)
+	err = s.Repo.DeleteMembership(groupID, userID)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *GroupService) InviteUserToGroup(groupID int, creatorID int, invite models.InviteRequest) (models.Notification, error) {
+    dbCreatorID, err := s.Repo.GetGroupCreatorID(groupID)
+    if err != nil {
+        return models.Notification{}, fmt.Errorf("group not found")
+    }
+
+    if dbCreatorID != creatorID {
+        return models.Notification{}, fmt.Errorf("not authorized")
+    }
+
+    // Get group title for notification
+    groupDetails, err := s.Repo.GetGroupDetailsByID(groupID, creatorID)
+    if err != nil {
+        return models.Notification{}, fmt.Errorf("failed to get group details: %w", err)
+    }
+
+    // Get creator nickname for notification
+    creatorNickname, err := s.Repo.GetUserNickname(creatorID)
+    if err != nil {
+        return models.Notification{}, fmt.Errorf("failed to get creator nickname: %w", err)
+    }
+
+    err = s.Repo.UpsertGroupInvitation(groupID, invite.UserID)
+    if err != nil {
+        return models.Notification{}, err
+    }
+
+    // Create and send notification to invited user
+    notification := models.Notification{
+        SenderID:       creatorID,
+        SenderNickname: creatorNickname,
+        GroupId:        groupID,
+        Type:           "group_invitation",
+        Message:        fmt.Sprintf("%s invited you to join the group: %s", creatorNickname, groupDetails.Title),
+        Seen:           false,
+        CreatedAt:      time.Now().Format(time.RFC3339),
+    }
+    
+    _, err = s.Repo.CreateNotification(invite.UserID, notification)
+    if err != nil {
+        return models.Notification{}, fmt.Errorf("failed to create notification: %w", err)
+    }
+
+    return notification, nil
 }
 
 func (s *GroupService) ApproveMembership(groupID int, creatorID int, body models.ApproveRequest) error {

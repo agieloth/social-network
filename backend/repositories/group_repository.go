@@ -131,6 +131,13 @@ func (r *GroupRepository) UpdateMembershipStatus(groupID, userID int, status str
 	return err
 }
 
+func (r *GroupRepository) DeleteMembership(groupID, userID int) error {
+	_, err := r.db.Exec(`
+		DELETE FROM group_memberships
+		WHERE group_id = ? AND user_id = ?`, groupID, userID)
+	return err
+}
+
 func (r *GroupRepository) UpsertGroupInvitation(groupID, userID int) error {
 	_, err := r.db.Exec(`
 		INSERT INTO group_memberships (group_id, user_id, status)
@@ -751,4 +758,13 @@ func (r *GroupRepository) CreateNotification(recipientID int, notification model
     }
     
     return int(id), nil
+}
+
+func (r *GroupRepository) GetUserNickname(userID int) (string, error) {
+    var nickname string
+    err := r.db.QueryRow("SELECT nickname FROM users WHERE id = ?", userID).Scan(&nickname)
+    if err != nil {
+        return "", fmt.Errorf("failed to get user nickname: %w", err)
+    }
+    return nickname, nil
 }
