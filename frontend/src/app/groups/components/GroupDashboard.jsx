@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GroupDashboard.module.css';
@@ -168,7 +168,7 @@ export default function GroupDashboard({ group, onClose, isCreator, nonMembers, 
   return (
     <div className={styles.groupDashboardOverlay}>
       <Navbar
-        user={user}
+        user={currentUser}
         handleSearch={handleSearch}
         handleLogout={handleLogout}
         results={results}
@@ -195,8 +195,8 @@ export default function GroupDashboard({ group, onClose, isCreator, nonMembers, 
       )}
 
       {showPostForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
+        <div className={styles.postFormOverlay}>
+          <div className={styles.postFormContainer}>
             <PostForm
               content={content}
               setContent={setContent}

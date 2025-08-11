@@ -15,9 +15,10 @@ import EventFormModal from './components/EventFormModal'
 import InviteModal from './components/InviteModal'
 import PendingRequests from '../components/PendingRequests'
 import JoinStatus from './components/JoinStatus'
+import styles from './GroupDetailPage.module.css'
 
 export default function GroupDetailPage({ params }) {
-    // All hooks at the top (no conditional returns above this)
+  // All hooks at the top (no conditional returns above this)
   const { groupId } = use(params)
   const [group, setGroup] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -79,8 +80,8 @@ export default function GroupDetailPage({ params }) {
   if (error) return <ErrorState error={error} />
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-      <div className="max-w-4xl mx-auto p-4 pt-24">
+    <div className={styles.page}>
+      <div className={styles.container}>
         <GroupHeader group={group} />
 
         <JoinStatus group={group} handleJoin={handleJoin} />
@@ -91,7 +92,7 @@ export default function GroupDetailPage({ params }) {
           isCreator={group.is_creator}
         />
 
-        <div className="space-y-4">
+        <div className={styles.contentSpace}>
           {activeTab === 'posts' && (
             <PostsTab
               group={group}
@@ -109,7 +110,7 @@ export default function GroupDetailPage({ params }) {
           )}
 
           {activeTab === 'requests' && group.is_creator && (
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+            <div className={styles.requestsContainer}>
               <PendingRequests groupId={group.id} />
             </div>
           )}
@@ -153,12 +154,12 @@ export default function GroupDetailPage({ params }) {
 
 function LoadingState() {
   return (
-    <div className="min-h-screen bg-gray-900">
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-800 rounded w-1/2"></div>
-          <div className="h-6 bg-gray-800 rounded w-3/4"></div>
-          <div className="h-40 bg-gray-800 rounded"></div>
+    <div className={styles.loadingPage}>
+      <div className={styles.loadingContainer}>
+        <div className={styles.pulseWrapper}>
+          <div className={styles.loadingBarShort}></div>
+          <div className={styles.loadingBarMedium}></div>
+          <div className={styles.loadingBox}></div>
         </div>
       </div>
     </div>
@@ -167,8 +168,8 @@ function LoadingState() {
 
 function ErrorState({ error }) {
   return (
-    <div className="min-h-screen bg-gray-900">
-      <div className="max-w-4xl mx-auto p-4 text-red-500">
+    <div className={styles.errorPage}>
+      <div className={styles.errorContainer}>
         {error}
       </div>
     </div>

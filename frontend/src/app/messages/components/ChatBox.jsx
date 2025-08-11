@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import EmojiPicker from '../../home/components/Emoji'
+import styles from './ChatBox.module.css'
 
 export default function ChatBox({ currentUser, recipient, onSendMessage, messages = [], input, setInput, onClose }) {
   const scrollRef = useRef()
@@ -12,11 +13,9 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Support both recipient.id and recipient.ID for compatibility
   const recipientId = recipient?.id || recipient?.ID
   const userId = currentUser?.ID
 
-  // Validate message structure
   const isValidMessage = useCallback((msg) => {
     return msg && 
            typeof msg === 'object' && 
@@ -26,7 +25,6 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
            'timestamp' in msg
   }, [])
 
-  // Load chat history only once when chat opens
   useEffect(() => {
     const loadChatHistory = async () => {
       if (!recipientId || !userId) return
@@ -69,11 +67,9 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
     loadChatHistory()
   }, [recipientId, userId, isValidMessage])
 
-  // Handle new real-time messages
   useEffect(() => {
     if (!Array.isArray(messages)) return
     
-    // Filter and validate messages for this chat
     const relevantMessages = messages
       .filter(msg => isValidMessage(msg))
       .filter(msg => 
@@ -127,7 +123,6 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
     
     setInput(newText)
     
-    // Focus and position cursor after emoji
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus()
@@ -146,43 +141,40 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
     }
   }, [handleSend, chatError])
 
-  // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [allMessages])
 
-  // Render message content with basic formatting
   const renderMessageContent = useCallback((content) => {
     if (!content) return null
     
-    // Simple URL detection
     const urlRegex = /(https?:\/\/[^\s]+)/g
     return content.split(urlRegex).map((part, i) => 
       part.match(urlRegex) 
-        ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{part}</a>
+        ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className={styles.link}>{part}</a>
         : part
     )
   }, [])
 
   if (!recipient) {
     return (
-      <div className="w-96 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-4">
-        <p className="text-red-400">Recipient information missing</p>
+      <div className={styles.container}>
+        <p className={styles.errorText}>Recipient information missing</p>
       </div>
     )
   }
 
   return (
-    <div className="w-96 bg-gray-800 rounded-lg shadow-lg border border-gray-700 p-3 flex flex-col relative">
+    <div className={styles.container}>
       {/* Header */}
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-medium text-white">
+      <div className={styles.header}>
+        <span className={styles.recipientName}>
           {recipient.full_name || 'Unknown User'}
         </span>
         <button
-          className="text-red-400 hover:text-red-300 text-lg"
+          className={styles.closeBtn}
           onClick={onClose}
           aria-label="Close chat"
         >
@@ -191,37 +183,33 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
       </div>
 
       {/* Messages area */}
-      <div className="max-h-[60vh] min-h-[300px] overflow-y-auto bg-gray-900 rounded p-2 text-sm text-gray-300 flex-1 mb-2">
+      <div className={styles.messagesArea}>
         {isLoading ? (
-          <div className="flex justify-center items-center h-full">
-            <p className="text-gray-400">Loading messages...</p>
+          <div className={styles.loadingContainer}>
+            <p className={styles.loadingText}>Loading messages...</p>
           </div>
         ) : chatError ? (
-          <div className="text-center p-4">
-            <div className="text-red-400 mb-2">🚫</div>
-            <p className="text-red-400 text-sm">{chatError}</p>
-            <p className="text-gray-500 text-xs mt-2">
+          <div className={styles.errorContainer}>
+            <div className={styles.errorIcon}>🚫</div>
+            <p className={styles.errorText}>{chatError}</p>
+            <p className={styles.infoText}>
               To chat, you need to follow each other.
             </p>
           </div>
         ) : allMessages.length === 0 ? (
-          <p className="text-gray-500 italic text-center py-4">No messages yet</p>
+          <p className={styles.noMessages}>No messages yet</p>
         ) : (
           allMessages.map((message) => (
             <div
               key={`${message.from}-${message.to}-${message.timestamp}`}
-              className={`mb-2 ${message.from === userId ? 'text-right' : 'text-left'}`}
+              className={`${styles.messageWrapper} ${message.from === userId ? styles.messageRight : styles.messageLeft}`}
             >
-              <div className={`inline-block px-3 py-1 rounded-lg max-w-[80%] break-words ${
-                message.from === userId
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-200'
-              }`}>
-                <div className="text-xs opacity-70 mb-1">
+              <div className={`${styles.messageBubble} ${message.from === userId ? styles.messageSent : styles.messageReceived}`}>
+                <div className={styles.messageSender}>
                   {message.from === userId ? 'You' : recipient.full_name}
                 </div>
                 <div>{renderMessageContent(message.content)}</div>
-                <div className="text-xs opacity-70 mt-1">
+                <div className={styles.messageTime}>
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit'
@@ -235,16 +223,12 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
       </div>
 
       {/* Input area */}
-      <div className="flex relative">
-        <div className="flex-1 relative">
+      <div className={styles.inputArea}>
+        <div className={styles.inputWrapper}>
           <input
             ref={inputRef}
             type="text"
-            className={`w-full border text-white rounded-l px-2 py-1 pr-8 text-sm focus:outline-none ${
-              chatError
-                ? 'bg-gray-600 border-gray-500 cursor-not-allowed'
-                : 'bg-gray-700 border-gray-600 focus:border-blue-500'
-            }`}
+            className={`${styles.input} ${chatError ? styles.inputDisabled : styles.inputEnabled}`}
             value={input}
             onChange={(e) => !chatError && setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -257,7 +241,7 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-yellow-400 text-sm"
+              className={styles.emojiBtn}
               aria-label="Toggle emoji picker"
             >
               😊
@@ -266,11 +250,7 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
         </div>
 
         <button
-          className={`ml-2 px-3 rounded-r text-sm ${
-            chatError || !input.trim()
-              ? 'bg-gray-600 cursor-not-allowed opacity-50'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
+          className={`${styles.sendBtn} ${(chatError || !input.trim()) ? styles.sendBtnDisabled : styles.sendBtnEnabled}`}
           onClick={handleSend}
           disabled={!!chatError || !input.trim()}
           aria-label="Send message"

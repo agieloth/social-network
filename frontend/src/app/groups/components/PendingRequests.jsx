@@ -1,7 +1,7 @@
 // src/app/groups/components/PendingRequests.jsx
 'use client'
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
+import styles from './PendingRequests.module.css'
 
 export default function PendingRequests({ groupId }) {
   const [requests, setRequests] = useState([])
@@ -67,17 +67,17 @@ export default function PendingRequests({ groupId }) {
     }
   }
 
-  if (loading) return <div className="text-center py-4">Loading requests...</div>
-  if (error) return <div className="text-red-500 text-center py-4">{error}</div>
+  if (loading) return <div className={styles.loading}>Loading requests...</div>
+  if (error) return <div className={styles.error}>{error}</div>
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Pending Join Requests ({requests && requests.length})</h3>
+    <div className={styles.container}>
+      <h3 className={styles.title}>Pending Join Requests ({requests && requests.length})</h3>
       
       {requests === null ? (
-        <p className="text-gray-500 text-center py-4">No pending requests</p>
+        <p className={styles.noRequests}>No pending requests</p>
       ) : (
-        <ul className="divide-y divide-gray-700">
+        <ul className={styles.list}>
           {requests.map(request => {
             // Construct proper avatar URL
             let avatarUrl = '/avatar.png'
@@ -88,36 +88,36 @@ export default function PendingRequests({ groupId }) {
             }
 
             return (
-              <li key={request.request_id} className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+              <li key={request.request_id} className={styles.listItem}>
+                <div className={styles.flexBetween}>
+                  <div className={styles.flexCenter}>
                     <img
                       src={request.avatar ? `http://localhost:8080/${request.avatar}` : '/avatar.png'}
                       alt={request.username}
                       width={40}
                       height={40}
-                      className="rounded-full"
+                      className={styles.avatar}
                       onError={(e) => {
                         e.target.src = '/avatar.png'
                       }}
                     />
                     <div>
-                      <p className="font-medium">{request.username}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className={styles.username}>{request.username}</p>
+                      <p className={styles.requestDate}>
                         Requested {new Date(request.requested_at).toLocaleString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className={styles.buttonGroup}>
                     <button
                       onClick={() => handleApprove(request.request_id, request.user_id)}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                      className={styles.approveBtn}
                     >
                       Approve
                     </button>
                     <button
                       onClick={() => handleDecline(request.request_id, request.user_id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                      className={styles.declineBtn}
                     >
                       Decline
                     </button>
