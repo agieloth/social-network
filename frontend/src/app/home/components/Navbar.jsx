@@ -368,73 +368,73 @@ export function Navbar() {
   };
 
   const handleInviteAccept = async (groupId, notifId) => {
-  try {
-    // First accept the invitation (this will update the membership status to 'accepted')
-    const res = await fetch(`/api/groups/${groupId}/membership/accept`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-
-    if (res.ok) {
-      // Mark notification as seen and delete it
-      await fetch('/api/notifications/seen', {
+    try {
+      // First accept the invitation (this will update the membership status to 'accepted')
+      const res = await fetch(`/api/groups/${groupId}/membership/accept`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notification_id: notifId }),
         credentials: 'include',
       });
 
-      await fetch('/api/notifications/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notification_id: notifId }),
-        credentials: 'include',
-      });
+      if (res.ok) {
+        // Mark notification as seen and delete it
+        await fetch('/api/notifications/seen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notification_id: notifId }),
+          credentials: 'include',
+        });
 
-      // Remove the notification from state
-      setNotifications(prev => prev.filter(n => n.id !== notifId));
-    } else {
-      console.error('Failed to accept invitation');
+        await fetch('/api/notifications/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notification_id: notifId }),
+          credentials: 'include',
+        });
+
+        // Remove the notification from state
+        setNotifications(prev => prev.filter(n => n.id !== notifId));
+      } else {
+        console.error('Failed to accept invitation');
+      }
+    } catch (err) {
+      console.error('Error accepting group invitation:', err);
     }
-  } catch (err) {
-    console.error('Error accepting group invitation:', err);
-  }
-};
+  };
 
-const handleInviteDecline = async (groupId, notifId) => {
-  try {
-    // First decline the invitation (this will remove the membership record)
-    const res = await fetch(`/api/groups/${groupId}/membership/refuse`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    if (res.ok) {
-      // Mark notification as seen and delete it
-      await fetch('/api/notifications/seen', {
+  const handleInviteDecline = async (groupId, notifId) => {
+    try {
+      // First decline the invitation (this will remove the membership record)
+      const res = await fetch(`/api/groups/${groupId}/membership/refuse`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notification_id: notifId }),
-        credentials: 'include',
+        credentials: 'include'
       });
 
-      await fetch('/api/notifications/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notification_id: notifId }),
-        credentials: 'include',
-      });
+      if (res.ok) {
+        // Mark notification as seen and delete it
+        await fetch('/api/notifications/seen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notification_id: notifId }),
+          credentials: 'include',
+        });
 
-      // Remove the notification from state
-      setNotifications(prev => prev.filter(n => n.id !== notifId));
-    } else {
-      alert(res.status)
-      console.error('Failed to decline invitation');
+        await fetch('/api/notifications/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notification_id: notifId }),
+          credentials: 'include',
+        });
+
+        // Remove the notification from state
+        setNotifications(prev => prev.filter(n => n.id !== notifId));
+      } else {
+        alert(res.status)
+        console.error('Failed to decline invitation');
+      }
+    } catch (err) {
+      console.error('Error declining group invitation:', err);
     }
-  } catch (err) {
-    console.error('Error declining group invitation:', err);
-  }
-};
+  };
 
   const togglePrivacy = async () => {
     try {
@@ -458,20 +458,20 @@ const handleInviteDecline = async (groupId, notifId) => {
       if (notificationsRef.current &&
         !notificationsRef.current.contains(event.target) &&
         !notificationButtonRef.current.contains(event.target)) {
-          setShowNotifications(false);
-        }
-      };
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-    // Initial notifications fetch
-    useEffect(() => {
-      fetchNotifications();
-    }, []);
-    if (!user) {
-      return
-    }
+  // Initial notifications fetch
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+  if (!user) {
+    return
+  }
 
   return (
     <>
@@ -485,7 +485,7 @@ const handleInviteDecline = async (groupId, notifId) => {
               onChange={handleSearch}
               value={search}
               className={styles.searchInput}
-              />
+            />
             {results && results.length > 0 && (
               <div className={styles.searchResults}>
                 {results.map((user) => (
@@ -590,7 +590,7 @@ const handleInviteDecline = async (groupId, notifId) => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleApprove(notif.id, notif.sender_id, notif.GroupId);
+                                  handleApprove(notif.id, notif.sender_id, notif.group_id);
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.acceptButton}`}
                               >
@@ -599,7 +599,7 @@ const handleInviteDecline = async (groupId, notifId) => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDecline(notif.id, notif.sender_id, notif.GroupId);
+                                  handleDecline(notif.id, notif.sender_id, notif.group_id);
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.rejectButton}`}
                               >
@@ -612,7 +612,7 @@ const handleInviteDecline = async (groupId, notifId) => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleVote(notif.EventId, notif.GroupId, 'going', notif.id)
+                                  handleVote(notif.event_id, notif.group_id, 'going', notif.id)
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.acceptButton}`}
                               >
@@ -621,7 +621,7 @@ const handleInviteDecline = async (groupId, notifId) => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleVote(notif.EventId, notif.GroupId, 'not_going', notif.id);
+                                  handleVote(notif.event_id, notif.group_id, 'not_going', notif.id)
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.rejectButton}`}
                               >

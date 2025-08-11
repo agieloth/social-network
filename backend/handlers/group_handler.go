@@ -925,11 +925,13 @@ func (h *GroupHandler) HandleEventVote(w http.ResponseWriter, r *http.Request) {
 	// Extract event ID from URL: /api/groups/{groupID}/events/{eventID}/vote
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) < 6 {
+		fmt.Println("error")
 		http.Error(w, "Invalid path", http.StatusBadRequest)
 		return
 	}
 	eventID, err := strconv.Atoi(parts[len(parts)-2])
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Invalid event ID", http.StatusBadRequest)
 		return
 	}
@@ -938,6 +940,7 @@ func (h *GroupHandler) HandleEventVote(w http.ResponseWriter, r *http.Request) {
 		Response string `json:"response"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		fmt.Println(err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}

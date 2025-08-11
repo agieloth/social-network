@@ -5,8 +5,15 @@ let isConnected = false;
 let userId = null;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
+let reconnectInterval = null; // Add this line for interval tracking
 
 function connectWebSocket() {
+  // Clear any existing interval
+  if (reconnectInterval) {
+    clearInterval(reconnectInterval);
+    reconnectInterval = null;
+  }
+
   socket = new WebSocket(`ws://localhost:8080/ws?userId=${encodeURIComponent(userId)}`);
 
   socket.onopen = () => {
@@ -17,18 +24,14 @@ function connectWebSocket() {
 
   socket.onmessage = (msg) => {
     try {
-      
       const parsed = JSON.parse(msg.data);
-
       console.log("coming data : ", parsed);
       
-
       // Forward all messages to all ports
       broadcast({
         type: "message",
         data: parsed
       });
-
     } catch (err) {
       console.error("Error parsing message:", err);
       broadcast({
@@ -54,12 +57,17 @@ function connectWebSocket() {
       message: "🔌 WebSocket disconnected"
     });
 
-    // Attempt reconnect
-    if (reconnectAttempts < maxReconnectAttempts) {
-      reconnectAttempts++;
-      setTimeout(() => {
-        connectWebSocket();
-      }, 1000 * reconnectAttempts); // Exponential backoff
+    // Start reconnection attempts every 3 seconds
+    if (!reconnectInterval) {
+      reconnectInterval = setInterval(() => {
+        if (reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          connectWebSocket();
+        } else {
+          clearInterval(reconnectInterval);
+          reconnectInterval = null;
+        }
+      }, 3000); // 3 seconds
     }
   };
 }

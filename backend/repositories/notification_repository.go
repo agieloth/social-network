@@ -38,33 +38,36 @@ func (repo *NotificationRepository) GetNotificationsByUserID(userID int) ([]mode
     var notifications []models.Notification
 
     for rows.Next() {
-        var notif models.Notification
-        var groupID sql.NullInt64  // Use sql.NullInt64 to handle NULL values
-        
-        err := rows.Scan(
-            &notif.ID,
-            &notif.SenderID,
-            &notif.SenderNickname,
-            &groupID,  // Scan into NullInt64 first
-            &notif.EventId,
-            &notif.Type,
-            &notif.Message,
-            &notif.Seen,
-            &notif.CreatedAt,
-        )
-        if err != nil {
-            log.Println("Failed to scan notification:", err)
-            continue
-        }
-        
-        // Convert sql.NullInt64 to *int
-        if groupID.Valid {
-            groupIDInt := int(groupID.Int64)
-            notif.GroupId = groupIDInt
-        }
-        
-        notifications = append(notifications, notif)
+    var notif models.Notification
+    var groupID sql.NullInt64
+    var eventID sql.NullInt64 // Handle NULL for event_id
+
+    err := rows.Scan(
+        &notif.ID,
+        &notif.SenderID,
+        &notif.SenderNickname,
+        &groupID,
+        &eventID, // Scan into NullInt64
+        &notif.Type,
+        &notif.Message,
+        &notif.Seen,
+        &notif.CreatedAt,
+    )
+    if err != nil {
+        log.Println("Failed to scan notification:", err)
+        continue
     }
+
+    if groupID.Valid {
+        notif.GroupId = int(groupID.Int64)
+    }
+    if eventID.Valid {
+        notif.EventId = int(eventID.Int64)
+    }
+
+    notifications = append(notifications, notif)
+}
+
 
     return notifications, nil
 }

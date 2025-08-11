@@ -67,7 +67,7 @@ func (r *ChatRepository) CanUsersChat(userID1, userID2 int) (bool, error) {
 	err := r.DB.QueryRow(`
 		SELECT COUNT(*) FROM followers 
 		WHERE (follower_id = ? AND followed_id = ? AND status = 'accepted')
-		AND EXISTS (
+		OR EXISTS (
 			SELECT 1 FROM followers 
 			WHERE follower_id = ? AND followed_id = ? AND status = 'accepted'
 		)
