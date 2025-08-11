@@ -89,3 +89,28 @@
   color: #f56565; /* red-500 */
 }
 
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #4a5568; /* bg-gray-700 */
+  color: white;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px; /* rounded-full */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.fab:hover {
+  background-color: #2d3748; /* bg-gray-800 */
+}
+
+.fabIcon {
+  width: 2rem;
+  height: 2rem;
+}
+

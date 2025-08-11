@@ -71,7 +71,7 @@ onconnect = function (e) {
   port.onmessage = function (event) {
     const data = event.data;
 
-    console.log(data)
+    console.log("ya rbi salama ",data)
 
     switch (data.type) {
       case "INIT":
@@ -81,7 +81,9 @@ onconnect = function (e) {
         }
         break;
 
-      case "group_message":
+      case "group":
+        console.log("test if the groupsend the message ", data);
+        
         if (socket && isConnected) {
           try {
             const payload = JSON.stringify(data);
@@ -94,6 +96,8 @@ onconnect = function (e) {
             });
           }
         } else {
+          console.log('hhhhhhhhhhhhhhhhh');
+          
           port.postMessage({
             type: "error",
             message: "WebSocket not connected"

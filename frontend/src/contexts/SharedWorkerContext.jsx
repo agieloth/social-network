@@ -14,6 +14,8 @@ export function SharedWorkerProvider({ children }) {
     port.start()
 
     const handleMessage = (event) => {
+      console.log("event hhhhh", event.data);
+      
       setWorkerMessages(prev => [...prev, event.data])
     }
 
@@ -31,6 +33,7 @@ export function SharedWorkerProvider({ children }) {
 
   return (
     <SharedWorkerContext.Provider value={{
+      worker: workerRef.current,
       workerMessages,
       sendWorkerMessage
     }}>

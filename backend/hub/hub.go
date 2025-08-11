@@ -23,12 +23,12 @@ type Hub struct {
 
 func NewHub(messageService *services.ChatService) *Hub {
 	return &Hub{
-		Clients:        make(map[int]*Client),
-		Register:       make(chan *Client),
-		Unregister:     make(chan *Client),
-		Broadcast:      make(chan models.Message),
+		Clients:           make(map[int]*Client),
+		Register:          make(chan *Client),
+		Unregister:        make(chan *Client),
+		Broadcast:         make(chan models.Message),
 		groupMembersCache: make(map[int][]int),
-		messageService: messageService,
+		messageService:    messageService,
 	}
 }
 
@@ -69,7 +69,7 @@ func (h *Hub) Run() {
 					}
 				}
 
-			case "group_message":
+			case "group":
 				// Process group message
 				if err := h.messageService.ProcessGroupMessage(msg); err != nil {
 					fmt.Println("Error processing group message:", err)
@@ -82,7 +82,7 @@ func (h *Hub) Run() {
 					fmt.Printf("❌ Failed to get group members: %v\n", err)
 					continue
 				}
-
+				fmt.Println("member", members)
 
 				// Broadcast to all connected group members except sender
 				for _, memberID := range members {
@@ -91,8 +91,15 @@ func (h *Hub) Run() {
 					}
 
 					if client, ok := h.Clients[memberID]; ok {
+						msg.To = memberID
+						msgBytes, err := json.Marshal(msg)
+						if err != nil {
+							fmt.Println("❌ Failed to marshal message:", err)
+							continue
+						}
 						select {
 						case client.Send <- msgBytes:
+							fmt.Println("nothing", string(msgBytes))
 							// Message sent successfully
 						default:
 							// Handle full channel or disconnected client

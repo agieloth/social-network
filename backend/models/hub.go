@@ -8,6 +8,6 @@ type Notification struct {
 	Message        string `json:"message"`
 	Seen           bool   `json:"seen"`
 	CreatedAt      string `json:"created_at"`
-	GroupId        int    `json:"group_id,omitempty`
-	EventId        int    `json:"event_id,omitempty`
+	GroupId        int    `json:"group_id,omitempty"`
+	EventId        int    `json:"event_id,omitempty"`
 }
