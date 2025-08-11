@@ -9,7 +9,7 @@ export function SharedWorkerProvider({ children }) {
   const [workerMessages, setWorkerMessages] = useState([])
 
   useEffect(() => {
-    workerRef.current = new SharedWorker('/sharedWorker.js')
+    workerRef.current = new SharedWorker('/sharedWorker.jsx')
     const { port } = workerRef.current
     port.start()
 

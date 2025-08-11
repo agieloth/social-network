@@ -46,7 +46,7 @@ export default function HomePage() {
     if (!user?.ID) return;
 
     if (!workerRef.current) {
-      workerRef.current = new SharedWorker('/sharedWorker.js');
+      workerRef.current = new SharedWorker('/sharedWorker.jsx');
       const port = workerRef.current.port;
 
       port.start();

@@ -4,15 +4,16 @@ import GroupList from './components/GroupList'
 import CreateGroupModal from './components/CreateGroupModal'
 import { useAuth } from '../../contexts/AuthContext'
 import { redirect } from 'next/navigation'
+import styles from './GroupsPage.module.css'
 
 function LoadingState() {
   return (
-    <div className="min-h-screen bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
-        <div className="animate-pulse space-y-4">
-          <div className="h-12 bg-gray-800 rounded w-1/2 mx-auto"></div>
-          <div className="h-6 bg-gray-800 rounded w-1/3 mx-auto"></div>
-          <div className="h-40 bg-gray-800 rounded mt-8"></div>
+    <div className={styles.loadingScreen}>
+      <div className={styles.loadingContainer}>
+        <div className={`${styles.pulse} ${styles.loadingContent}`}>
+          <div className={styles.loadingHeader}></div>
+          <div className={styles.loadingSubHeader}></div>
+          <div className={styles.loadingBox}></div>
         </div>
       </div>
     </div>
@@ -21,8 +22,8 @@ function LoadingState() {
 
 function ErrorState({ error }) {
   return (
-    <div className="min-h-screen bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24 text-red-500">
+    <div className={styles.errorScreen}>
+      <div className={`${styles.errorContainer} ${styles.errorText}`}>
         {error}
       </div>
     </div>
@@ -54,27 +55,27 @@ export default function GroupsPage() {
   if (error) return <ErrorState error={error} />
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+    <div className={styles.groupsPage}>
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
+      <div className={styles.mainContent}>
         {/* Header with animated gradient */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-4">
+        <div className={styles.header}>
+          <h1 className={styles.title}>
             Your Communities
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className={styles.subtitle}>
             Connect, share, and grow with like-minded people
           </p>
         </div>
         
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <div className={styles.actionBar}>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300"
+            className={styles.createGroupButton}
           >
             <svg
-              className="w-5 h-5 mr-2"
+              className={styles.createGroupIcon}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -90,7 +91,7 @@ export default function GroupsPage() {
         </div>
         
         {/* Group List */}
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700/50 p-6 shadow-2xl">
+        <div className={styles.groupListContainer}>
           <GroupList />
         </div>
       </div>
