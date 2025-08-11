@@ -8,6 +8,7 @@ import { useSharedWorker } from '../../../contexts/SharedWorkerContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PostForm from '../../../app/home/components/PostForm';
 import { useMessageSidebar } from '../../../contexts/MessageSideBarContext';
+import Image from 'next/image';
 import styles from './Navbar.module.css';
 
 export function Navbar() {
@@ -658,6 +659,10 @@ export function Navbar() {
                 </div>
               )}
             </div>
+
+            <Link href="/" className={styles.homeLink}>
+              🏠 Home
+            </Link>
 
             <Link href="/groups" className={styles.groupsLink}>👥 Groups</Link>
 

@@ -356,3 +356,17 @@
   justify-content: center;
   z-index: 50;
 }
+
+.homeLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.homeLink:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
