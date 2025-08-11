@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import styles from './EventFormModal.module.css'
 
 export default function EventFormModal({ showEventForm, setShowEventForm, groupId }) {
   const [eventForm, setEventForm] = useState({
@@ -58,10 +59,10 @@ export default function EventFormModal({ showEventForm, setShowEventForm, groupI
   if (!showEventForm) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
-        <form onSubmit={handleEventSubmit} className="space-y-4">
-          <h2 className="text-xl font-bold text-white mb-4">Create New Event</h2>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <form onSubmit={handleEventSubmit} className={styles.form}>
+          <h2 className={styles.title}>Create New Event</h2>
 
           <FormField
             label="Event Title"
@@ -92,18 +93,18 @@ export default function EventFormModal({ showEventForm, setShowEventForm, groupI
             required
           />
 
-          <div className="flex justify-end space-x-3">
+          <div className={styles.buttonGroup}>
             <button
               type="button"
               onClick={() => setShowEventForm(false)}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              className={`${styles.button} ${styles.buttonCancel}`}
               disabled={creatingEvent}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              className={`${styles.button} ${styles.buttonSubmit}`}
               disabled={creatingEvent}
             >
               {creatingEvent ? 'Creating...' : 'Create Event'}
@@ -117,8 +118,8 @@ export default function EventFormModal({ showEventForm, setShowEventForm, groupI
 
 function FormField({ label, id, name, value, onChange, type = 'text', textarea = false, required = false }) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 mb-1">
+    <div className={styles.formField}>
+      <label htmlFor={id} className={styles.label}>
         {label}
       </label>
       {textarea ? (
@@ -128,7 +129,7 @@ function FormField({ label, id, name, value, onChange, type = 'text', textarea =
           value={value}
           onChange={onChange}
           rows={3}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={styles.textarea}
           required={required}
         />
       ) : (
@@ -138,7 +139,7 @@ function FormField({ label, id, name, value, onChange, type = 'text', textarea =
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={styles.input}
           required={required}
         />
       )}

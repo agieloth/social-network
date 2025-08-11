@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import PostForm from '../../../home/components/PostForm'
+import styles from './PostsTab.module.css'
 
 export default function PostsTab({ group, showPostForm, setShowPostForm }) {
   const [posts, setPosts] = useState([])
@@ -86,12 +87,12 @@ export default function PostsTab({ group, showPostForm, setShowPostForm }) {
     <>
       <button
         onClick={() => setShowPostForm(true)}
-        className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+        className={styles.createPostButton}
       >
         Create Post
       </button>
 
-      <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+      <div className={styles.postsContainer}>
         {posts.length > 0 ? (
           posts.map(post => (
             <PostItem 
@@ -106,7 +107,7 @@ export default function PostsTab({ group, showPostForm, setShowPostForm }) {
             />
           ))
         ) : (
-          <p className="text-gray-400">No posts yet. Be the first to post!</p>
+          <p className={styles.noPostsText}>No posts yet. Be the first to post!</p>
         )}
       </div>
     </>
@@ -115,21 +116,21 @@ export default function PostsTab({ group, showPostForm, setShowPostForm }) {
 
 function PostItem({ post, comments, loadingComments, commentInputs, postingComment, onCommentChange, onCommentSubmit }) {
   return (
-    <div className="mb-4 p-4 bg-gray-700/50 rounded-lg">
-      <p className="text-white">{post.content}</p>
+    <div className={styles.postItem}>
+      <p className={styles.postContent}>{post.content}</p>
       {post.image && (
         <img
           src={`${post.image}`}
           alt="Post"
-          className="mt-2 rounded-lg max-w-full h-auto"
+          className={styles.postImage}
         />
       )}
 
-      <div className="mt-4">
+      <div className={styles.commentsSection}>
         {loadingComments[post.id] ? (
-          <div className="text-gray-400 text-sm">Loading comments...</div>
+          <div className={styles.loadingComments}>Loading comments...</div>
         ) : (
-          <div className="space-y-3">
+          <div className={styles.commentsList}>
             {comments[post.id]?.map(comment => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
@@ -150,9 +151,9 @@ function PostItem({ post, comments, loadingComments, commentInputs, postingComme
 
 function CommentItem({ comment }) {
   return (
-    <div className="p-3 bg-gray-600/30 rounded">
-      <p className="text-sm text-white">{comment.content}</p>
-      <p className="text-xs text-gray-400 mt-1">
+    <div className={styles.commentItem}>
+      <p className={styles.commentContent}>{comment.content}</p>
+      <p className={styles.commentInfo}>
         {comment.creator_name} • {new Date(comment.created_at).toLocaleString()}
       </p>
     </div>
@@ -161,18 +162,18 @@ function CommentItem({ comment }) {
 
 function CommentInput({ value, onChange, onSubmit, disabled, posting }) {
   return (
-    <div className="flex items-center gap-2 mt-3">
+    <div className={styles.commentInputContainer}>
       <input
         type="text"
         placeholder="Add a comment..."
         value={value}
         onChange={onChange}
-        className="flex-1 px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className={styles.commentInput}
       />
       <button
         onClick={onSubmit}
         disabled={disabled}
-        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+        className={styles.commentButton}
       >
         {posting ? 'Posting...' : 'Post'}
       </button>

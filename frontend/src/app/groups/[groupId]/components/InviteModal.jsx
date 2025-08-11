@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import styles from './InviteModal.module.css'
 
 export default function InviteModal({ showInviteForm, setShowInviteForm, groupId }) {
   const [invitableMembers, setInvitableMembers] = useState([])
@@ -48,25 +49,25 @@ export default function InviteModal({ showInviteForm, setShowInviteForm, groupId
   if (!showInviteForm) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
-        <h2 className="text-xl font-bold text-white mb-4">Invite Members</h2>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <h2 className={styles.title}>Invite Members</h2>
         
         {invitableMembers && invitableMembers.length > 0 ? (
-          <div className="space-y-4">
-            <div className="max-h-96 overflow-y-auto">
+          <div className={styles.membersListContainer}>
+            <div className={styles.membersList}>
               {invitableMembers.map(member => (
-                <div key={member.id} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                <div key={member.id} className={styles.memberItem}>
+                  <div className={styles.memberInfo}>
+                    <div className={styles.avatar}>
                       {member.username.charAt(0)}
                     </div>
-                    <span className="text-white">{member.name}</span>
+                    <span className={styles.memberName}>{member.name}</span>
                   </div>
                   <button
                     onClick={() => handleInviteMember(member.id)}
                     disabled={invitingMemberId === member.id}
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className={styles.inviteButton}
                   >
                     {invitingMemberId === member.id ? 'Inviting...' : 'Invite'}
                   </button>
@@ -74,22 +75,22 @@ export default function InviteModal({ showInviteForm, setShowInviteForm, groupId
               ))}
             </div>
 
-            <div className="flex justify-end">
+            <div className={styles.closeButtonContainer}>
               <button
                 type="button"
                 onClick={() => setShowInviteForm(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                className={styles.closeButton}
               >
                 Close
               </button>
             </div>
           </div>
         ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-400">No members available to invite</p>
+          <div className={styles.emptyState}>
+            <p className={styles.emptyStateText}>No members available to invite</p>
             <button
               onClick={() => setShowInviteForm(false)}
-              className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              className={`${styles.closeButton} ${styles.emptyStateCloseButton}`}
             >
               Close
             </button>

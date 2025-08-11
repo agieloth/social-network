@@ -1,6 +1,8 @@
+import styles from './GroupTabs.module.css'
+
 export default function GroupTabs({ activeTab, setActiveTab, isCreator }) {
   return (
-    <div className="flex border-b border-gray-700 mb-6">
+    <div className={styles.tabsContainer}>
       <TabButton 
         name="posts"
         activeTab={activeTab}
@@ -34,10 +36,16 @@ export default function GroupTabs({ activeTab, setActiveTab, isCreator }) {
 }
 
 function TabButton({ name, activeTab, setActiveTab, label }) {
+  const isActive = activeTab === name
+  const buttonClasses = [
+    styles.tabButton,
+    isActive && styles.active
+  ].filter(Boolean).join(' ')
+
   return (
     <button
       onClick={() => setActiveTab(name)}
-      className={`px-4 py-2 ${activeTab === name ? 'text-blue-400 border-b-2 border-blue-500' : 'text-gray-400 hover:text-white'}`}
+      className={buttonClasses}
     >
       {label}
     </button>

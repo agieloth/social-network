@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../../contexts/AuthContext'
+import styles from './GroupChat.module.css'
 
 export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
   const [groupChatInput, setGroupChatInput] = useState('')
@@ -37,18 +38,18 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
   if (!showGroupChat) return null
 
   return (
-    <div className="fixed inset-0 z-40 pointer-events-none">
-      <div className="absolute right-0 top-0 h-full w-96 bg-gray-800 shadow-lg border-l border-gray-700 flex flex-col pointer-events-auto">
-        <div className="flex justify-between items-center p-4 border-b border-gray-700">
-          <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold text-white">Group Chat: {group?.title}</h3>
-            <span className={`h-2 w-2 rounded-full ${user ? 'bg-green-500' : 'bg-red-500'}`}></span>
+    <div className={styles.chatOverlay}>
+      <div className={styles.chatContainer}>
+        <div className={styles.chatHeader}>
+          <div className={styles.headerTitleContainer}>
+            <h3 className={styles.headerTitle}>Group Chat: {group?.title}</h3>
+            <span className={`${styles.statusIndicator} ${user ? styles.statusOnline : styles.statusOffline}`}></span>
           </div>
           <button
             onClick={() => setShowGroupChat(false)}
-            className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700"
+            className={styles.closeButton}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className={styles.closeIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -69,9 +70,9 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
 
 function ChatMessages({ messages, user }) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className={styles.messagesContainer}>
       {messages.length === 0 ? (
-        <p className="text-gray-400 text-center py-10">
+        <p className={styles.emptyMessages}>
           {user ? "No messages yet. Start the conversation!" : "Connecting to chat..."}
         </p>
       ) : (
@@ -84,13 +85,21 @@ function ChatMessages({ messages, user }) {
 }
 
 function ChatMessage({ message }) {
+  const messageRowClasses = [
+    styles.messageRow,
+    message.isCurrentUser ? styles.currentUser : styles.otherUser
+  ].join(' ')
+
+  const messageBubbleClasses = [
+    styles.messageBubble,
+    message.isCurrentUser ? styles.currentUser : styles.otherUser
+  ].join(' ')
+
   return (
-    <div className={`flex ${message.isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-      <div
-        className={`max-w-xs p-3 rounded-lg ${message.isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white'}`}
-      >
-        <p className="text-sm">{message.content}</p>
-        <p className="text-xs mt-1 opacity-70">
+    <div className={messageRowClasses}>
+      <div className={messageBubbleClasses}>
+        <p className={styles.messageContent}>{message.content}</p>
+        <p className={styles.messageInfo}>
           {message.isCurrentUser ? 'You' : message.sender_name || 'User'} • {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
@@ -100,8 +109,8 @@ function ChatMessage({ message }) {
 
 function ChatInput({ value, onChange, onKeyPress, onSend, disabled }) {
   return (
-    <div className="p-4 border-t border-gray-700">
-      <div className="flex gap-2">
+    <div className={styles.chatInputContainer}>
+      <div className={styles.inputWrapper}>
         <input
           type="text"
           value={value}
@@ -109,12 +118,12 @@ function ChatInput({ value, onChange, onKeyPress, onSend, disabled }) {
           onKeyPress={onKeyPress}
           placeholder={disabled ? "Connecting..." : "Type a message..."}
           disabled={disabled}
-          className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+          className={styles.chatInput}
         />
         <button
           onClick={onSend}
           disabled={!value.trim() || disabled}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
+          className={styles.sendButton}
         >
           Send
         </button>

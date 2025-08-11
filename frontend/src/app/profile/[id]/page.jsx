@@ -151,7 +151,7 @@ export default function PublicProfilePage() {
         </div>
 
         {tab === 'posts' && (
-          posts.length === 0 ? (
+          posts === null ? (
             <p className={styles.subText}>Aucune publication pour le moment.</p>
           ) : (
             <div className={styles.postList}>
