@@ -24,18 +24,11 @@ export default function MessageSidebar({
   useEffect(() => {
     if (showMessages && fetchChatUsers) {
       fetchChatUsers();
-      pollingInterval.current = setInterval(() => {
-        fetchChatUsers();
-      }, 3000);
-    } else {
-      if (pollingInterval.current) {
-        clearInterval(pollingInterval.current);
-        pollingInterval.current = null;
-      }
     }
     return () => {
       if (pollingInterval.current) {
         clearInterval(pollingInterval.current);
+        pollingInterval.current = null;
       }
     };
   }, [showMessages, fetchChatUsers]);

@@ -25,6 +25,13 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
            'timestamp' in msg
   }, [])
 
+  // Generate unique key for messages
+  const generateMessageKey = useCallback((message, index) => {
+    const baseKey = `${message.from}-${message.to}-${message.timestamp}`;
+    const contentSnippet = message.content ? message.content.substring(0, 20) : '';
+    return `${baseKey}-${contentSnippet}-${index}`;
+  }, [])
+
   useEffect(() => {
     const loadChatHistory = async () => {
       if (!recipientId || !userId) return
@@ -199,9 +206,9 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
         ) : allMessages.length === 0 ? (
           <p className={styles.noMessages}>No messages yet</p>
         ) : (
-          allMessages.map((message) => (
+          allMessages.map((message, index) => (
             <div
-              key={`${message.from}-${message.to}-${message.timestamp}`}
+              key={generateMessageKey(message, index)}
               className={`${styles.messageWrapper} ${message.from === userId ? styles.messageRight : styles.messageLeft}`}
             >
               <div className={`${styles.messageBubble} ${message.from === userId ? styles.messageSent : styles.messageReceived}`}>

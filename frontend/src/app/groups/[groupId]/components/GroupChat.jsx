@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../../../contexts/AuthContext'
 import { useSharedWorker } from '../../../../contexts/SharedWorkerContext'
+import EmojiPicker from '../../../home/components/Emoji'
 import styles from './GroupChat.module.css'
 
 export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
@@ -9,8 +10,10 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
   const [onlineUsers, setOnlineUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const { user } = useAuth()
   const { worker, sendWorkerMessage } = useSharedWorker()
+  const inputRef = useRef()
 
   useEffect(() => {
     if (showGroupChat && group?.id) {
@@ -22,13 +25,13 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
     if (worker) {
       worker.port.onmessage = (event) => {
         console.log("rah dkhel");
-        
+
         const message = event.data.data;
         if (event.type === 'user_online' && message.groupId === parseInt(group?.id)) {
           setOnlineUsers(prev => [...prev, message.from])
         } else if (message.type === 'group' && message.groupId === parseInt(group?.id)) {
           console.log("dkhel tra hna ");
-          
+
           setGroupChatMessages(prev => [...prev, message])
         }
       }
@@ -70,6 +73,7 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
       isCurrentUser: true
     }])
     setGroupChatInput('')
+    setShowEmojiPicker(false)
 
     sendWorkerMessage(message)
   }
@@ -79,6 +83,25 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
       e.preventDefault()
       sendGroupChatMessage()
     }
+  }
+
+  const handleEmojiSelect = (emoji) => {
+    if (!inputRef.current) return
+    
+    const cursorPos = inputRef.current.selectionStart || groupChatInput.length
+    const newText = groupChatInput.substring(0, cursorPos) + emoji + groupChatInput.substring(cursorPos)
+    
+    setGroupChatInput(newText)
+    
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus()
+        inputRef.current.setSelectionRange(
+          cursorPos + emoji.length, 
+          cursorPos + emoji.length
+        )
+      }
+    }, 0)
   }
 
   if (!showGroupChat) return null
@@ -102,12 +125,16 @@ export default function GroupChat({ showGroupChat, setShowGroupChat, group }) {
         </div>
 
         <ChatMessages messages={groupChatMessages} user={user} loading={loading} error={error} onlineUsers={onlineUsers} />
-        <ChatInput 
+        <ChatInput
+          ref={inputRef}
           value={groupChatInput}
           onChange={setGroupChatInput}
           onKeyPress={handleChatKeyPress}
           onSend={sendGroupChatMessage}
           disabled={!user}
+          showEmojiPicker={showEmojiPicker}
+          setShowEmojiPicker={setShowEmojiPicker}
+          onEmojiSelect={handleEmojiSelect}
         />
       </div>
     </div>
@@ -136,7 +163,7 @@ function ChatMessages({ messages, user, loading, error, onlineUsers }) {
         </p>
       ) : (
         messages.map((msg, index) => (
-          <ChatMessage key={index} message={{...msg, isCurrentUser: msg.from === user?.ID, isOnline: onlineUsers.includes(msg.from)}} />
+          <ChatMessage key={index} message={{ ...msg, isCurrentUser: msg.from === user?.ID, isOnline: onlineUsers.includes(msg.from) }} />
         ))
       )}
       <div ref={messagesEndRef} />
@@ -155,12 +182,24 @@ function ChatMessage({ message }) {
     message.isCurrentUser ? styles.currentUser : styles.otherUser
   ].join(' ')
 
+  // Function to render message content with clickable links (same as ChatBox)
+  const renderMessageContent = (content) => {
+    if (!content) return null
+    
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    return content.split(urlRegex).map((part, i) => 
+      part.match(urlRegex) 
+        ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className={styles.link}>{part}</a>
+        : part
+    )
+  }
+
   return (
     <div className={messageRowClasses}>
       <div className={messageBubbleClasses}>
-        <p className={styles.messageContent}>{message.content}</p>
+        <p className={styles.messageContent}>{renderMessageContent(message.content)}</p>
         <p className={styles.messageInfo}>
-          {message.isCurrentUser ? 'You' : message.sender_name || 'User'} 
+          {message.isCurrentUser ? 'You' : message.sender_name || 'User'}
           {message.isOnline && <span className={styles.onlineIndicator}></span>}
           • {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
@@ -169,11 +208,21 @@ function ChatMessage({ message }) {
   )
 }
 
-function ChatInput({ value, onChange, onKeyPress, onSend, disabled }) {
+const ChatInput = React.forwardRef(({ 
+  value, 
+  onChange, 
+  onKeyPress, 
+  onSend, 
+  disabled, 
+  showEmojiPicker, 
+  setShowEmojiPicker, 
+  onEmojiSelect 
+}, ref) => {
   return (
     <div className={styles.chatInputContainer}>
       <div className={styles.inputWrapper}>
         <input
+          ref={ref}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -181,15 +230,36 @@ function ChatInput({ value, onChange, onKeyPress, onSend, disabled }) {
           placeholder={disabled ? "Connecting..." : "Type a message..."}
           disabled={disabled}
           className={styles.chatInput}
+          aria-label="Message input"
         />
+        
+        {!disabled && (
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className={styles.emojiBtn}
+            aria-label="Toggle emoji picker"
+          >
+            😊
+          </button>
+        )}
+
         <button
           onClick={onSend}
           disabled={!value.trim() || disabled}
           className={styles.sendButton}
+          aria-label="Send message"
         >
           Send
         </button>
       </div>
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        isOpen={showEmojiPicker}
+        onClose={() => setShowEmojiPicker(false)}
+        onEmojiSelect={onEmojiSelect}
+      />
     </div>
   )
-}
+})

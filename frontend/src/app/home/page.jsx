@@ -8,6 +8,7 @@ import ChatBox from "../messages/components/ChatBox";
 import Post from './components/Post'
 import styles from './HomePage.module.css'
 import { useMessageSidebar } from "../../contexts/MessageSideBarContext";
+import { type } from "os";
 
 export default function HomePage() {
   // States for posts, user, UI, etc.
@@ -42,46 +43,68 @@ export default function HomePage() {
   const router = useRouter();
 
   // Setup SharedWorker connection once user is set
-  useEffect(() => {
-    if (!user?.ID) return;
+// Setup SharedWorker connection once user is set
+useEffect(() => {
+  if (!user?.ID) return;
 
-    if (!workerRef.current) {
-      workerRef.current = new SharedWorker('/sharedWorker.jsx');
-      const port = workerRef.current.port;
+  if (!workerRef.current) {
+    workerRef.current = new SharedWorker('/sharedWorker.jsx');
+    const port = workerRef.current.port;
 
-      port.start();
-      port.postMessage({ type: "INIT", userId: user.ID });
+    port.start();
+    port.postMessage({ type: "INIT", userId: user.ID });
 
-      port.onmessage = (event) => {
-        const { type, message } = event.data;
-        if (type === "message" || type === "private") {
-          setMessages((prev) => [...prev, message]);
-        }
-
-        if (type === "notification" || type === "follow_request" ||
-          type === "follow_request_response" || type === "follow_request_cancelled") {
-          setNotifications(prev => [message, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          setRealtimeNotification(message);
-        }
-
-        if (type === "status" || type === "error") {
-          console.log(`[Worker]: ${message}`);
-        }
-      };
-    }
-
-    // Cleanup on unmount or user change
-    return () => {
-      workerRef.current?.port?.close();
-      workerRef.current = null;
+    port.onmessage = (event) => {
+      console.log("Message received from SharedWorker:", event.data);
+      
+      // Handle the message structure properly
+      const { type, data, message } = event.data;
+      
+      // For messages with 'data' property (like your example)
+      if (data && (type === "message" || data.type === "private")) {
+        console.log('Processing chat message');
+        
+        setMessages((prev) => [...prev, data]);
+      }
+      // For messages with direct 'message' property (your existing structure)
+      else if (message && (type === "message" || type === "private")) {
+        console.log('Processing chat message (legacy format)');
+        
+        setMessages((prev) => [...prev, message]);
+      }
+      // Handle notifications
+      else if (type === "notification" || type === "follow_request" ||
+        type === "follow_request_response" || type === "follow_request_cancelled") {
+        const notificationData = data || message;
+        setNotifications(prev => [notificationData, ...prev]);
+        setUnreadCount(prev => prev + 1);
+        setRealtimeNotification(notificationData);
+      }
+      // Handle status and error messages
+      else if (type === "status" || type === "error") {
+        const statusMessage = data || message;
+        console.log(`[Worker]: ${statusMessage}`);
+      }
     };
-  }, [user?.ID]);
+  }
+
+  // Cleanup on unmount or user change
+  return () => {
+    workerRef.current?.port?.close();
+    workerRef.current = null;
+  };
+}, [user?.ID]);
 
   // Send chat message through SharedWorker
   const sendMessage = useCallback((chatMsg) => {
     if (!workerRef.current) {
       console.error("SharedWorker not initialized.");
+      return;
+    }
+
+    // Validate chatMsg before proceeding
+    if (!chatMsg || typeof chatMsg !== 'object') {
+      console.error("Invalid chat message:", chatMsg);
       return;
     }
 
@@ -94,11 +117,16 @@ export default function HomePage() {
     };
 
     setMessages(prev => {
+      // Filter out any null/undefined messages first
+      const validPrev = prev.filter(m => m && typeof m === 'object');
+
       // Avoid duplicates if very close timestamp
-      const exists = prev.some(m =>
+      const exists = validPrev.some(m =>
+        m &&
         m.from === chatMsg.from &&
         m.to === chatMsg.to &&
         m.content === chatMsg.content &&
+        m.timestamp && chatMsg.timestamp &&
         Math.abs(new Date(m.timestamp) - new Date(chatMsg.timestamp)) < 1000
       );
 
@@ -137,7 +165,7 @@ export default function HomePage() {
     fetchPosts();
   }, []);
 
-  const fetchChatUsers = async () => {
+  const fetchChatUsers = useCallback(async () => {
     try {
       const res = await fetch("http://localhost:8080/api/chat-users", {
         credentials: "include",
@@ -148,7 +176,7 @@ export default function HomePage() {
     } catch (err) {
       console.error("Error fetching users:", err);
     }
-  };
+  }, []);
 
   const fetchUser = async () => {
     try {
