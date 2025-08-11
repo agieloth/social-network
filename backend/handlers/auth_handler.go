@@ -130,6 +130,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_id")
 	if err != nil {
 		http.Error(w, "No session cookie found", http.StatusUnauthorized)
+		return
 	}
 	_, err = db.Exec(`DELETE FROM sessions WHERE id = ?`, cookie.Value)
 	if err != nil {

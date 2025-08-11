@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useSharedWorker } from '../../../contexts/SharedWorkerContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PostForm from '../../../app/home/components/PostForm';
@@ -168,7 +168,7 @@ export function Navbar() {
   const handleLogout = async () => {
     try {
       await fetch('/api/logout', { credentials: 'include', method: 'POST' });
-      router.push('/login');
+      window.location.reload();
     } catch (err) {
       console.error('Logout error:', err);
     }
