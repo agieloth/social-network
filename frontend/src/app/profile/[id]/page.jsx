@@ -176,7 +176,7 @@ export default function PublicProfilePage() {
 
         {tab === 'followers' && (
           <div className={styles.userList}>
-            {followers.length === 0 ? (
+            {followers === null ? (
               <p className={styles.subText}>Aucun abonné pour l'instant.</p>
             ) : (
               followers.map(user => (
