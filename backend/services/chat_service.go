@@ -38,7 +38,9 @@ func (s *ChatService) GetAllChatUsers(requesterID int) ([]models.ChatUser, error
 
 	return users, nil
 }
-
+func (s *ChatService) CanChat(userID, otherID int) (bool, error){
+	return s.Repo.CanUsersChat(userID, otherID)
+}
 func (s *ChatService) GetChatHistory(userID, otherID int) ([]models.Message, error) {
 	canChat, err := s.Repo.CanUsersChat(userID, otherID)
 	if err != nil {

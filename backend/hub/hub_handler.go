@@ -14,6 +14,7 @@ type Handler struct {
 	service *services.AuthService
 	session *services.SessionService
 	group   *services.GroupService
+	serv    *services.ChatService
 	hub     *Hub
 }
 
