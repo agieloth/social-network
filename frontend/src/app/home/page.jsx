@@ -70,6 +70,7 @@ export default function HomePage() {
 
   // NEW: Function to show browser notification
   const showBrowserNotification = useCallback((sender, message) => {
+
     if ('Notification' in window && Notification.permission === 'granted' && !isWindowFocused) {
       const notification = new Notification(`New message from ${sender.username || sender.name}`, {
         body: message.content,
@@ -91,22 +92,12 @@ export default function HomePage() {
     }
   }, [isWindowFocused, openChats]);
 
-  // NEW: Function to play notification sound
-  const playNotificationSound = useCallback(() => {
-    try {
-      const audio = new Audio('/notification-sound.mp3'); // Add a notification sound file to your public folder
-      audio.volume = 0.3;
-      audio.play().catch(e => console.log('Could not play notification sound:', e));
-    } catch (e) {
-      console.log('Notification sound not available:', e);
-    }
-  }, []);
-
   // NEW: Function to handle incoming message notifications
   const handleIncomingMessage = useCallback((messageData) => {
+    console.log(messageData, "nothing just test")
     const senderId = messageData.from;
-    const sender = chatUsers.find(u => (u.id || u.ID) === senderId) || 
-                   { id: senderId, username: 'Unknown User' };
+    const sender = chatUsers.find(u => (u.id || u.ID) === senderId) ||
+      { id: senderId, username: 'Unknown User' };
 
     // Update unread message count
     setUnreadMessages(prev => ({
@@ -114,7 +105,7 @@ export default function HomePage() {
       [senderId]: (prev[senderId] || 0) + 1
     }));
 
-    // Add to message notifications array
+    //Add to message notifications array
     setMessageNotifications(prev => [{
       id: Date.now(),
       sender,
@@ -124,11 +115,6 @@ export default function HomePage() {
     }, ...prev.slice(0, 9)]); // Keep only last 10 notifications
 
     // Show browser notification if window is not focused
-    showBrowserNotification(sender, messageData);
-
-    // Play notification sound
-    playNotificationSound();
-
     // Show in-app notification toast
     setRealtimeNotification({
       type: 'message',
@@ -137,11 +123,11 @@ export default function HomePage() {
       sender: sender // Add sender info for click handling
     });
 
-    // Auto-remove toast after 5 seconds (increased time)
+    //Auto-remove toast after 5 seconds (increased time)
     setTimeout(() => {
       setRealtimeNotification(null);
     }, 5000);
-  }, [chatUsers, showBrowserNotification, playNotificationSound]);
+  }, [chatUsers, showBrowserNotification]);
 
   // Setup SharedWorker connection once user is set
   useEffect(() => {
@@ -156,14 +142,14 @@ export default function HomePage() {
 
       port.onmessage = (event) => {
         console.log("Message received from SharedWorker:", event.data);
-        
+
         const { type, data, message } = event.data;
-        
+
         // Handle incoming messages
         if (data && (type === "message" || data.type === "private")) {
           console.log('Processing chat message');
           setMessages((prev) => [...prev, data]);
-          
+
           // NEW: Check if message is from another user (not sent by current user)
           if (data.from !== user.ID) {
             handleIncomingMessage(data);
@@ -172,7 +158,7 @@ export default function HomePage() {
         else if (message && (type === "message" || type === "private")) {
           console.log('Processing chat message (legacy format)');
           setMessages((prev) => [...prev, message]);
-          
+
           // NEW: Check if message is from another user
           if (message.from !== user.ID) {
             handleIncomingMessage(message);
@@ -200,10 +186,10 @@ export default function HomePage() {
       ...prev,
       [userId]: 0
     }));
-    
-    setMessageNotifications(prev => 
-      prev.map(notif => 
-        (notif.sender.id || notif.sender.ID) === userId 
+
+    setMessageNotifications(prev =>
+      prev.map(notif =>
+        (notif.sender.id || notif.sender.ID) === userId
           ? { ...notif, read: true }
           : notif
       )
@@ -235,12 +221,12 @@ export default function HomePage() {
     // Throttle implementation
     const now = Date.now();
     const throttleDelay = 1000; // 1 second throttle
-    
+
     if (lastMessageTime.current && now - lastMessageTime.current < throttleDelay) {
       console.log("Message throttled - please wait before sending another message");
       return;
     }
-    
+
     lastMessageTime.current = now;
 
     workerRef.current.port.postMessage({ type: "SEND", message: chatMsg });
@@ -283,7 +269,7 @@ export default function HomePage() {
   const handleMessageIndicatorClick = () => {
     // Open messages sidebar
     setShowMessages(true);
-    
+
     // Find users with unread messages and open their chats
     Object.entries(unreadMessages).forEach(([userId, count]) => {
       if (count > 0) {
@@ -466,7 +452,7 @@ export default function HomePage() {
     <div className={styles.pageContainer}>
       {/* NEW: Notification Toast */}
       {realtimeNotification && (
-        <div 
+        <div
           className={`${styles.notificationToast} ${realtimeNotification.type === 'message' ? styles.messageNotification : ''}`}
           onClick={realtimeNotification.type === 'message' ? handleNotificationClick : undefined}
           style={{ cursor: realtimeNotification.type === 'message' ? 'pointer' : 'default' }}
@@ -480,7 +466,7 @@ export default function HomePage() {
                 </small>
               )}
             </span>
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 setRealtimeNotification(null);
@@ -507,7 +493,7 @@ export default function HomePage() {
 
       {/* NEW: Message notification indicator in top bar or wherever appropriate */}
       {totalUnreadMessages > 0 && (
-        <div 
+        <div
           className={styles.messageIndicator}
           onClick={handleMessageIndicatorClick}
         >
@@ -542,7 +528,7 @@ export default function HomePage() {
           <Post key={post.id} post={post} fetchUserById={fetchUserById} />
         ))
       )}
-      
+
       <div className={styles.chatBoxContainer}>
         {openChats.map((u) => (
           <ChatBox
