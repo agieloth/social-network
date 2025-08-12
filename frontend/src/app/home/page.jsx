@@ -44,6 +44,9 @@ export default function HomePage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState({});
 
+  // NEW: Throttling ref
+  const lastMessageTime = useRef(null);
+
   const router = useRouter();
 
   // NEW: Request notification permission on component mount
@@ -217,7 +220,7 @@ export default function HomePage() {
     markMessagesAsRead(userId);
   };
 
-  // Send chat message through SharedWorker
+  // Send chat message through SharedWorker with throttling
   const sendMessage = useCallback((chatMsg) => {
     if (!workerRef.current) {
       console.error("SharedWorker not initialized.");
@@ -228,6 +231,17 @@ export default function HomePage() {
       console.error("Invalid chat message:", chatMsg);
       return;
     }
+
+    // Throttle implementation
+    const now = Date.now();
+    const throttleDelay = 1000; // 1 second throttle
+    
+    if (lastMessageTime.current && now - lastMessageTime.current < throttleDelay) {
+      console.log("Message throttled - please wait before sending another message");
+      return;
+    }
+    
+    lastMessageTime.current = now;
 
     workerRef.current.port.postMessage({ type: "SEND", message: chatMsg });
 
