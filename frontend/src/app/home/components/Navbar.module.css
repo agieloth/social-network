@@ -15,8 +15,8 @@
 
 /* Search Bar */
 .searchContainer {
-  max-width: 42rem;
-  width: 100%;
+  max-width: 39rem;
+  width: 60%;
   position: relative;
 }
 

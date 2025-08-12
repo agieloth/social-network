@@ -635,7 +635,7 @@ export function Navbar() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleInviteAccept(notif.GroupId, notif.id)
+                                  handleInviteAccept(notif.group_id, notif.id)
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.acceptButton}`}
                               >
@@ -644,7 +644,7 @@ export function Navbar() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleInviteDecline(notif.GroupId, notif.id)
+                                  handleInviteDecline(notif.group_id, notif.id)
                                 }}
                                 className={`${styles.notificationActionButton} ${styles.rejectButton}`}
                               >

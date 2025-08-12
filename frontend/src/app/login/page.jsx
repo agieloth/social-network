@@ -49,7 +49,7 @@ export default function LoginPage() {
         setMessage('✅ Login successful!')
         // Remove localStorage.setItem unless you specifically need it
         // The session cookie should be enough
-        router.push('/') // Navigate after successful login
+        window.location.reload() // Navigate after successful login
       } else {
         setMessage(data.message || `❌ Login failed (${res.status})`)
       }
