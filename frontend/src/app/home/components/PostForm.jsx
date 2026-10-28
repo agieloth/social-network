@@ -3,6 +3,7 @@
 
 import { useEffect, useState, forwardRef } from 'react'
 import styles from './PostForm.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 const PostForm = forwardRef(function PostForm(
   { content, setContent, image, setImage, privacy, setPrivacy, handleSubmit, creating, fileInputRef: fileInputRefProp, onClose, isGroupPost, error, success },
@@ -15,7 +16,7 @@ const PostForm = forwardRef(function PostForm(
   // Charger les abonnés quand privacy devient "custom"
   useEffect(() => {
     if (privacy === 'custom') {
-      fetch('http://localhost:8080/api/recipients', {
+      fetch(`${API_BASE_URL}/api/recipients`, {
         credentials: 'include',
       })
         .then(async (res) => {

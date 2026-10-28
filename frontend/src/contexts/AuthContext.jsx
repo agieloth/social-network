@@ -1,9 +1,10 @@
 // src/contexts/AuthContext.jsx
 'use client'
 import { createContext, useContext, useState, useEffect } from 'react'
+import { API_BASE_URL } from '@/config/api'
 
 const AuthContext = createContext()
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '')
+// const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '')
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null)

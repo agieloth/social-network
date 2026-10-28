@@ -4,8 +4,9 @@ import { useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useWorker } from '../contexts/WorkerContext'
 import { useNavbar } from '../contexts/NavBarContext'
+import { API_BASE_URL } from '@/config/api'
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '')
+// const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '')
 
 // Ce composant initialise le Worker global une seule fois
 export function WorkerInitializer() {

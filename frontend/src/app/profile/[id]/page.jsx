@@ -5,8 +5,9 @@ import { useRouter, useParams } from 'next/navigation'
 import { authApi, usersApi, postsApi, followApi } from '../../../lib/api'
 import toast from 'react-hot-toast'
 import styles from './PublicProfilePage.module.css'
+import { API_BASE_URL } from '@/config/api'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function PublicProfilePage() {
   const { id } = useParams()

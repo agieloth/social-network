@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import EmojiPicker from '../../home/components/Emoji'
 import styles from './ChatBox.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function ChatBox({ currentUser, recipient, onSendMessage, messages = [], input, setInput, onClose }) {
   const scrollRef = useRef()
@@ -40,7 +41,7 @@ export default function ChatBox({ currentUser, recipient, onSendMessage, message
       setIsLoading(true)
       
       try {
-        const res = await fetch(`http://localhost:8080/api/chat/history?with=${recipientId}`, {
+        const res = await fetch(`${API_BASE_URL}/chat/history?with=${recipientId}`, {
           credentials: 'include'
         })
 

@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useWorker } from '../contexts/WorkerContext'
+import { API_BASE_URL } from '@/config/api'
+
 
 export function useGlobalChat() {
   const [chatUsers, setChatUsers] = useState([])
@@ -22,7 +24,7 @@ export function useGlobalChat() {
 
   const fetchChatUsers = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/chat-users', {
+      const res = await fetch(`${API_BASE_URL}/api/chat-users`, {
         credentials: 'include',
       })
       if (!res.ok) throw new Error('Failed to fetch users')

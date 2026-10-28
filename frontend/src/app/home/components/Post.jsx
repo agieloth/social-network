@@ -5,6 +5,8 @@
 import { useState } from 'react'
 import CommentSection from './CommentSection'
 import styles from './Post.module.css'
+import { API_BASE_URL } from '@/config/api'
+
 
 export default function Post({ post, fetchUserById }) {
   const [showComments, setShowComments] = useState(false)
@@ -25,7 +27,7 @@ export default function Post({ post, fetchUserById }) {
             post.author_avatar
               ? post.author_avatar.startsWith('http')
                 ? post.author_avatar
-                : `http://localhost:8080/${post?.author_avatar}`
+                : `${API_BASE_URL}/${post?.author_avatar}`
               : '/avatar.png'
           }
           alt="Avatar"
@@ -48,7 +50,7 @@ export default function Post({ post, fetchUserById }) {
       {/* Image */}
       {post.image_url && (
         <img
-          src={`http://localhost:8080${post.image_url}`}
+          src={`${API_BASE_URL}${post.image_url}`}
           alt="Post"
           className={styles.postImage}
         />

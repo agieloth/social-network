@@ -1,5 +1,6 @@
 // MembersTab.jsx - Version corrigée avec support isCreator
 import styles from './MembersTab.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function MembersTab({ 
   group, 
@@ -73,7 +74,7 @@ function MemberItem({ member, isCreator }) {
   const avatarUrl = member.avatar 
     ? (member.avatar.startsWith('http') 
         ? member.avatar 
-        : `http://localhost:8080/${member.avatar.replace(/^\/+/, '')}`)
+        : `${API_BASE_URL}/${member.avatar.replace(/^\/+/, '')}`)
     : null;
 
   return (

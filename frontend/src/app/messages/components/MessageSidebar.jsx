@@ -5,6 +5,7 @@ import { useChat } from '../../../contexts/ChatContext'
 import { useMessageSidebar } from '../../../contexts/MessageSideBarContext'
 import { useAuth } from '../../../contexts/AuthContext'
 import styles from './MessageSidebar.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function MessageSidebar({
   chatUsers = [],
@@ -92,7 +93,7 @@ export default function MessageSidebar({
                     u.avatar
                       ? u.avatar.startsWith('http')
                         ? u.avatar
-                        : `http://localhost:8080/${u.avatar}`
+                        : `${API_BASE_URL}/${u.avatar}`
                       : '/avatar.png'
                   }
                   className={styles.avatar}
