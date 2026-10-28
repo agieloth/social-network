@@ -85,11 +85,12 @@ func (h *Hub) Run() {
 
 				// IMPORTANT: Also send confirmation back to sender for real-time display
 				// This ensures the sender sees the message immediately
-				if sender, ok := h.Clients[msg.From]; ok {
-					h.safeSend(sender, msgBytes)
-				} else {
-					fmt.Printf("⚠️ Sender user %d not connected (no confirmation sent)\n", msg.From)
-				}
+				
+				// if sender, ok := h.Clients[msg.From]; ok {
+				// 	h.safeSend(sender, msgBytes)
+				// } else {
+				// 	fmt.Printf("⚠️ Sender user %d not connected (no confirmation sent)\n", msg.From)
+				// }
 
 			case "group_message":
 				// Process group message
