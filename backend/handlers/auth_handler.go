@@ -47,6 +47,7 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		"avatar",
 		utils.DefaultImageUploadConfig("uploads/avatars"),
 	)
+	
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, "Failed to upload avatar: "+err.Error())
 		return
