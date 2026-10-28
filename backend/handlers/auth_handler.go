@@ -53,6 +53,11 @@ func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	form.Avatar = avatarPath
 
+	if err := form.Validate(); err != nil {
+    	utils.WriteError(w, http.StatusBadRequest, err.Error())
+    	return
+	}
+
 	// Déléguer au service
 	err = h.authService.Register(form)
 	if err != nil {
@@ -95,7 +100,8 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  expiration,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true, // Toujour true (HTTPS obligatoire)
+		SameSite: http.SameSiteStrictMode, // Bloque les attaques CSRF
 	})
 
 	user.Avatar = utils.PrepareAvatarURL(user.Avatar)
@@ -129,8 +135,8 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Secure:   false,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	utils.WriteSuccess(w, "Logged out successfully")

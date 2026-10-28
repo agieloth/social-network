@@ -42,3 +42,12 @@ type ErrorResponse struct {
 func WriteDetailedError(w http.ResponseWriter, status int, err ErrorResponse) {
 	WriteJSON(w, status, err)
 }
+
+
+func WriteValidationError(w http.ResponseWriter, err *models.ValidationError) {
+    WriteJSON(w, http.StatusBadRequest, map[string]interface{}{
+        "error":    err.Message,
+        "field":    err.Field,
+        "code":     "VALIDATION_ERROR",
+    })
+}
