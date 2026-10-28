@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"social/models"
 )
 
 // WriteJSON envoie une réponse JSON avec le statut spécifié

@@ -8,6 +8,7 @@ import (
 	"social/models"
 	"social/services"
 	"social/utils"
+	"strings"
 )
 
 type Handler struct {
@@ -21,52 +22,79 @@ func NewHandler(service *services.AuthService, sessionService *services.SessionS
 }
 
 func (h *Handler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
 
-	if err := utils.ParseMultipartFormSafe(r, 10<<20); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid form")
-		return
-	}
+    // Détecter le type de contenu
+    contentType := r.Header.Get("Content-Type")
+    var form models.RegisterRequest
+    var err error
 
-	form := models.RegisterRequest{
-		Email:       r.FormValue("email"),
-		Password:    r.FormValue("password"),
-		FirstName:   r.FormValue("first_name"),
-		LastName:    r.FormValue("last_name"),
-		DateOfBirth: r.FormValue("date_of_birth"),
-		Nickname:    r.FormValue("nickname"),
-		About:       r.FormValue("about"),
-	}
+    // Cas 1: JSON (ex: Postman, requêtes sans fichier)
+    if strings.Contains(contentType, "application/json") {
+        err = json.NewDecoder(r.Body).Decode(&form)
+        if err != nil {
+            utils.WriteError(w, http.StatusBadRequest, "Invalid JSON")
+            return
+        }
+        // Pas de fichier dans ce cas, avatar reste vide
+        form.Avatar = ""
 
-	// Upload avatar optionnel
-	avatarPath, err := utils.HandleOptionalFileUpload(
-		r,
-		"avatar",
-		utils.DefaultImageUploadConfig("uploads/avatars"),
-	)
-	
-	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Failed to upload avatar: "+err.Error())
-		return
-	}
-	form.Avatar = avatarPath
+    // Cas 2: Multipart (ex: frontend avec upload d'avatar)
+    } else if strings.Contains(contentType, "multipart/form-data") {
+        if err := utils.ParseMultipartFormSafe(r, 10<<20); err != nil {
+            utils.WriteError(w, http.StatusBadRequest, "Invalid form")
+            return
+        }
 
-	if err := form.Validate(); err != nil {
-    	utils.WriteError(w, http.StatusBadRequest, err.Error())
-    	return
-	}
+        form = models.RegisterRequest{
+            Email:       r.FormValue("email"),
+            Password:    r.FormValue("password"),
+            FirstName:   r.FormValue("first_name"),
+            LastName:    r.FormValue("last_name"),
+            DateOfBirth: r.FormValue("date_of_birth"),
+            Nickname:    r.FormValue("nickname"),
+            About:       r.FormValue("about"),
+        }
 
-	// Déléguer au service
-	err = h.authService.Register(form)
-	if err != nil {
-		utils.WriteError(w, http.StatusConflict, "Could not register: "+err.Error())
-		return
-	}
+        // Upload avatar optionnel
+        avatarPath, err := utils.HandleOptionalFileUpload(
+            r,
+            "avatar",
+            utils.DefaultImageUploadConfig("uploads/avatars"),
+        )
+        if err != nil {
+            utils.WriteError(w, http.StatusBadRequest, "Failed to upload avatar: "+err.Error())
+            return
+        }
+        form.Avatar = avatarPath
 
-	utils.WriteSuccess(w, "Registered successfully")
+    // Cas 3: Type inconnu
+    } else {
+        utils.WriteError(w, http.StatusUnsupportedMediaType, "Unsupported content type")
+        return
+    }
+
+    // Valider les données (nouvelle validation)
+    if err := form.Validate(); err != nil {
+        if valErr, ok := err.(*models.ValidationError); ok {
+            utils.WriteValidationError(w, valErr)
+        } else {
+            utils.WriteError(w, http.StatusBadRequest, err.Error())
+        }
+        return
+    }
+
+    // Déléguer au service
+    err = h.authService.Register(form)
+    if err != nil {
+        utils.WriteError(w, http.StatusConflict, "Could not register: "+err.Error())
+        return
+    }
+
+    utils.WriteSuccess(w, "Registered successfully")
 }
 
 func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +129,8 @@ func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  expiration,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true, // Toujour true (HTTPS obligatoire)
+		// Secure:   true, // Toujour true (HTTPS obligatoire)
+		Secure: r.TLS != nil,
 		SameSite: http.SameSiteStrictMode, // Bloque les attaques CSRF
 	})
 
@@ -136,7 +165,8 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		Secure:   true,
+		// Secure:   true,
+		Secure: r.TLS != nil,
 		SameSite: http.SameSiteStrictMode,
 	})
 
