@@ -128,7 +128,7 @@ func main() {
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	// 8. Setup Middleware
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := utils.RateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/ws" {
 			// Bypass CORS for WebSocket
 			mux.ServeHTTP(w, r)
@@ -136,7 +136,7 @@ func main() {
 		}
 		// Apply CORS to all other routes
 		utils.CorsMiddleware(mux).ServeHTTP(w, r)
-	})
+	}))
 
 	// 9. Start Server
 	port := os.Getenv("PORT")

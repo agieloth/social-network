@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.30
 	golang.org/x/crypto v0.36.0
 	require github.com/go-playground/validator/v10 v10.16.0
+	require github.com/ulule/limiter/v3 v3.11.0
 )
 
 require (

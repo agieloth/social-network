@@ -7,52 +7,64 @@ import (
 	"os"
 	"social/services"
 	"strings"
+	"net/http"
+    "time"
+
+    "github.com/ulule/limiter/v3"
+    "github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 // CorsMiddleware gère les CORS pour permettre les requêtes depuis le frontend
 func CorsMiddleware(next http.Handler) http.Handler {
-	allowedOriginsRaw := os.Getenv("CORS_ALLOWED_ORIGINS")
-	if strings.TrimSpace(allowedOriginsRaw) == "" {
-		allowedOriginsRaw = "http://localhost:3000,http://127.0.0.1:3000,https://social-network-frontend-helbadao.fly.dev,https://social-network.houssam-elbadaoui.tech"
-	}
+    // Origines autorisées (configurable via variable d'environnement)
+    allowedOriginsRaw := os.Getenv("CORS_ALLOWED_ORIGINS")
+    var allowedOrigins []string
 
-	allowedOrigins := make(map[string]struct{})
-	allowedWildcards := make([]string, 0)
-	for _, origin := range strings.Split(allowedOriginsRaw, ",") {
-		trimmed := strings.TrimSpace(origin)
-		if trimmed != "" {
-			normalized := normalizeOrigin(trimmed)
-			if normalized == "" {
-				continue
-			}
+    if allowedOriginsRaw == "" {
+        // Origines par défaut (à adapter selon ton environnement)
+        allowedOrigins = []string{
+            "http://localhost:3000",
+            "https://localhost:3000",
+            "http://127.0.0.1:3000",
+            "https://social-network-frontend-helbadao.fly.dev",
+            "https://social-network.houssam-elbadaoui.tech",
+        }
+    } else {
+        // Parser les origines depuis la variable d'environnement
+        allowedOrigins = strings.Split(allowedOriginsRaw, ",")
+        for i, origin := range allowedOrigins {
+            allowedOrigins[i] = strings.TrimSpace(origin)
+        }
+    }
 
-			if strings.Contains(normalized, "*.") {
-				allowedWildcards = append(allowedWildcards, normalized)
-				continue
-			}
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        origin := r.Header.Get("Origin")
 
-			allowedOrigins[normalized] = struct{}{}
-		}
-	}
+        // Vérifier si l'origine est autorisée
+        if !isOriginAllowed(origin, allowedOrigins) {
+            // Ne pas autoriser les CORS si l'origine n'est pas dans la liste
+            w.Header().Set("Vary", "Origin")
+            next.ServeHTTP(w, r)
+            return
+        }
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := normalizeOrigin(r.Header.Get("Origin"))
-		if origin != "" && isAllowedOrigin(origin, allowedOrigins, allowedWildcards) {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Add("Vary", "Origin")
-		}
+        // Autoriser l'origine
+        w.Header().Set("Access-Control-Allow-Origin", origin)
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
+        w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+        w.Header().Set("Access-Control-Expose-Headers", "Content-Length, X-RateLimit-Limit, X-RateLimit-Remaining")
+        w.Header().Set("Access-Control-Max-Age", "86400") // Cache pendant 24h
+        w.Header().Set("Vary", "Origin")
 
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        // Gérer les requêtes OPTIONS (preflight)
+        if r.Method == "OPTIONS" {
+            w.WriteHeader(http.StatusOK)
+            return
+        }
 
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
+        next.ServeHTTP(w, r)
+    })
 }
 
 func normalizeOrigin(origin string) string {
@@ -69,32 +81,18 @@ func normalizeOrigin(origin string) string {
 	return strings.ToLower(u.Scheme + "://" + u.Host)
 }
 
-func isAllowedOrigin(origin string, exact map[string]struct{}, wildcards []string) bool {
-	if _, ok := exact[origin]; ok {
-		return true
-	}
+func isOriginAllowed(origin string, allowedOrigins []string) bool {
+    if origin == "" {
+        return false
+    }
 
-	for _, pattern := range wildcards {
-		parts := strings.SplitN(pattern, "://", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		scheme, hostPattern := parts[0], parts[1]
+    for _, allowed := range allowedOrigins {
+        if strings.EqualFold(origin, allowed) {
+            return true
+        }
+    }
 
-		originParts := strings.SplitN(origin, "://", 2)
-		if len(originParts) != 2 || originParts[0] != scheme {
-			continue
-		}
-
-		if strings.HasPrefix(hostPattern, "*.") {
-			suffix := strings.TrimPrefix(hostPattern, "*.")
-			if strings.HasSuffix(originParts[1], "."+suffix) || originParts[1] == suffix {
-				return true
-			}
-		}
-	}
-
-	return false
+    return false
 }
 
 // AuthMiddleware vérifie l'authentification et injecte l'userID dans le contexte
@@ -117,4 +115,63 @@ func AuthMiddleware(sessionService *services.SessionService) func(http.Handler) 
 func GetUserIDFromContext(ctx context.Context) (int, bool) {
 	userID, ok := ctx.Value("userID").(int)
 	return userID, ok
+}
+
+// RateLimitMiddleware limite le nombre de requêtes par IP
+func RateLimitMiddleware(next http.Handler) http.Handler {
+    // Configuration : 100 requêtes par minute par IP
+    rate := limiter.Rate{
+        Period: 1 * time.Minute,
+        Limit:  100,
+    }
+
+    // Stocker les requêtes en mémoire (pour le dev)
+    // En production, utiliser Redis : limiter.NewRedisStore(redisClient)
+    store := memory.NewStore()
+
+    limiterInstance := limiter.New(store, rate)
+
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Récupérer l'IP du client
+        ip := getClientIP(r)
+
+        // Vérifier le rate limit pour cette IP
+        context, err := limiterInstance.Get(r.Context(), ip)
+        if err != nil {
+            WriteError(w, http.StatusInternalServerError, "rate limiter error")
+            return
+        }
+
+        // Ajouter les headers pour informer le client
+        w.Header().Add("X-RateLimit-Limit", fmt.Sprintf("%d", context.Limit))
+        w.Header().Add("X-RateLimit-Remaining", fmt.Sprintf("%d", context.Remaining))
+
+        // Si la limite est atteinte
+        if context.Reached {
+            WriteError(w, http.StatusTooManyRequests, "too many requests, please try again later")
+            return
+        }
+
+        // Sinon, continuer
+        next.ServeHTTP(w, r)
+    })
+}
+
+// getClientIP récupère l'IP du client (en tenant compte des proxys)
+func getClientIP(r *http.Request) string {
+    // Vérifier les headers courants pour les proxys
+    ip := r.Header.Get("X-Real-IP")
+    if ip == "" {
+        ip = r.Header.Get("X-Forwarded-For")
+    }
+    if ip == "" {
+        ip = r.RemoteAddr
+    }
+
+    // Si X-Forwarded-For contient plusieurs IPs, prendre la première
+    if strings.Contains(ip, ",") {
+        ip = strings.Split(ip, ",")[0]
+    }
+
+    return strings.TrimSpace(ip)
 }
