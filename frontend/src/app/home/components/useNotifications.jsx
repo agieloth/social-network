@@ -1,6 +1,7 @@
 // src/hooks/useNotifications.js
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavbar } from '../../../contexts/NavBarContext'
+import { API_BASE_URL } from '@/config/api'
 
 export function useNotifications(user, sendMessage) {
   const [showNotifications, setShowNotifications] = useState(false)
@@ -19,7 +20,7 @@ export function useNotifications(user, sendMessage) {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/notifications", { credentials: 'include' })
+      const res = await fetch(`${API_BASE_URL}/api/notifications`, { credentials: 'include' })
       const data = await res.json()
 
       const uniqueNotifs = []
@@ -49,7 +50,7 @@ export function useNotifications(user, sendMessage) {
 
     if (newState) {
       await fetchNotifications()
-      await fetch('http://localhost:8080/api/notifications/seen', {
+      await fetch(`${API_BASE_URL}/api/notifications/seen`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mark_all: true }),
@@ -63,7 +64,7 @@ export function useNotifications(user, sendMessage) {
 
   const handleAccept = useCallback(async (notifId, senderId) => {
     try {
-      await fetch('http://localhost:8080/api/follow/accept', {
+      await fetch(`${API_BASE_URL}/api/follow/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sender_id: senderId }),
@@ -72,14 +73,14 @@ export function useNotifications(user, sendMessage) {
 
       sendMessage({ type: 'FETCH_CHAT_USERS' })
 
-      await fetch('http://localhost:8080/api/notifications/seen', {
+      await fetch(`${API_BASE_URL}/api/notifications/seen`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notification_id: notifId }),
         credentials: 'include',
       })
 
-      await fetch('http://localhost:8080/api/notifications/delete', {
+      await fetch(`${API_BASE_URL}/api/notifications/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notification_id: notifId }),
@@ -94,19 +95,19 @@ export function useNotifications(user, sendMessage) {
   const handleReject = useCallback(async (notifId, senderId) => {
     try {
       const [rejectRes, seenRes, deleteRes] = await Promise.all([
-        fetch('http://localhost:8080/api/follow/reject', {
+        fetch(`${API_BASE_URL}/api/follow/reject`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sender_id: senderId }),
           credentials: 'include',
         }),
-        fetch('http://localhost:8080/api/notifications/seen', {
+        fetch(`${API_BASE_URL}/api/notifications/seen`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ notification_id: notifId }),
           credentials: 'include',
         }),
-        fetch('http://localhost:8080/api/notifications/delete', {
+        fetch(`${API_BASE_URL}/api/notifications/delete`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ notification_id: notifId }),

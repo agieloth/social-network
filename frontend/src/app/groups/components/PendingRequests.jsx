@@ -2,6 +2,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import styles from './PendingRequests.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function PendingRequests({ groupId }) {
   const [requests, setRequests] = useState([])
@@ -11,7 +12,7 @@ export default function PendingRequests({ groupId }) {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/groups/${groupId}/membership/pending_requests`, {
+        const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/membership/pending_requests`, {
           credentials: 'include'
         })
         
@@ -35,7 +36,7 @@ export default function PendingRequests({ groupId }) {
 
   const handleApprove = async (requestId, userId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/membership/approve`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/membership/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
@@ -52,7 +53,7 @@ export default function PendingRequests({ groupId }) {
 
   const handleDecline = async (requestId, userId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/membership/decline`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/membership/decline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
@@ -92,7 +93,7 @@ export default function PendingRequests({ groupId }) {
                 <div className={styles.flexBetween}>
                   <div className={styles.flexCenter}>
                     <img
-                      src={request.avatar ? `http://localhost:8080/${request.avatar}` : '/avatar.png'}
+                      src={request.avatar ? `${API_BASE_URL}/${request.avatar}` : '/avatar.png'}
                       alt={request.username}
                       width={40}
                       height={40}

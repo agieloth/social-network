@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import PostForm from '../../../home/components/PostForm'
 import styles from './PostFormModal.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function PostFormModal({ showPostForm, setShowPostForm, groupId }) {
   const [content, setContent] = useState('')
@@ -18,7 +19,7 @@ export default function PostFormModal({ showPostForm, setShowPostForm, groupId }
     if (image) formData.append('image', image)
 
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/posts`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/posts`, {
         method: 'POST',
         body: formData,
         credentials: 'include'

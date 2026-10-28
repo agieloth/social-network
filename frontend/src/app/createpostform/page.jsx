@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import styles from './CreatePostForm.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function CreatePostForm() {
   const [content, setContent] = useState('')
@@ -11,7 +12,7 @@ export default function CreatePostForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const res = await fetch('http://localhost:8080/api/posts', {
+    const res = await fetch(`${API_BASE_URL}/api/posts`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

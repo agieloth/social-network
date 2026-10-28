@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import styles from './EventFormModal.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function EventFormModal({ showEventForm, setShowEventForm, groupId, onEventCreated }) {
   const [eventForm, setEventForm] = useState({
@@ -69,7 +70,7 @@ export default function EventFormModal({ showEventForm, setShowEventForm, groupI
         event_date: new Date(eventForm.eventDate).toISOString()
       }
 
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/events`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

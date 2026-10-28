@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import styles from './CommentSection.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function CommentSection({ postId }) {
     const [comments, setComments] = useState([])
@@ -10,7 +11,7 @@ export default function CommentSection({ postId }) {
 
     const fetchComments = async () => {
         try {
-            const res = await fetch(`http://localhost:8080/api/comments/post?id=${postId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/comments/post?id=${postId}`, {
                 credentials: 'include',
             })
             if (res.ok) {
@@ -39,7 +40,7 @@ export default function CommentSection({ postId }) {
         }
 
         try {
-            const res = await fetch(`http://localhost:8080/api/comments`, {
+            const res = await fetch(`${API_BASE_URL}/api/comments`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -90,7 +91,7 @@ export default function CommentSection({ postId }) {
                                         comment.author.avatar
                                             ? comment.author.avatar.startsWith('http')
                                                 ? comment.author.avatar
-                                                : `http://localhost:8080/${comment.author.avatar}`
+                                                : `${API_BASE_URL}/${comment.author.avatar}`
                                             : '/avatar.png'
                                     }
                                     alt="Avatar"

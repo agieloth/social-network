@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './styles/UserProfilePopup.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function UserProfilePopup({
   selectedUser,
@@ -65,7 +66,7 @@ export default function UserProfilePopup({
     if (!selectedUser?.id || selectedUser.id === currentUser?.ID) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/follow/status/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/follow/status/${selectedUser.id}`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -86,7 +87,7 @@ export default function UserProfilePopup({
       if (!selectedUser?.id || selectedUser.id === currentUser?.ID) return
 
       try {
-        const res = await fetch(`http://localhost:8080/api/follow/status/${selectedUser.id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/follow/status/${selectedUser.id}`, {
           credentials: 'include'
         })
         if (res.ok) {
@@ -111,7 +112,7 @@ export default function UserProfilePopup({
     try {
       if (followStatus === 'accepted' || followStatus === 'pending') {
         // UNFOLLOW / CANCEL REQUEST
-        const res = await fetch('http://localhost:8080/api/unfollow', {
+        const res = await fetch(`${API_BASE_URL}/api/unfollow`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -127,7 +128,7 @@ export default function UserProfilePopup({
           // ✅ Si c'était une demande en attente, supprimer la notification côté frontend
           if (followStatus === 'pending') {
             try {
-              await fetch('http://localhost:8080/api/notifications/cancel-request', {
+              await fetch(`${API_BASE_URL}/api/notifications/cancel-request`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -158,7 +159,7 @@ export default function UserProfilePopup({
         }
       } else {
         // FOLLOW
-        const res = await fetch('http://localhost:8080/api/follow', {
+        const res = await fetch(`${API_BASE_URL}/api/follow`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -205,7 +206,7 @@ export default function UserProfilePopup({
                 selectedUser.avatar || selectedUser.author_avatar
                   ? (selectedUser.avatar || selectedUser.author_avatar).startsWith('http')
                     ? (selectedUser.avatar || selectedUser.author_avatar)
-                    : `http://localhost:8080/${selectedUser.avatar || selectedUser.author_avatar}`
+                    : `${API_BASE_URL}/${selectedUser.avatar || selectedUser.author_avatar}`
                   : '/avatar.png'
               }
               alt="Avatar"
@@ -262,7 +263,7 @@ export default function UserProfilePopup({
               selectedUser.author_avatar            
                 ? selectedUser.author_avatar.startsWith('http')
                   ? selectedUser.author_avatar
-                  : `http://localhost:8080/${selectedUser.author_avatar}`
+                  : `${API_BASE_URL}/${selectedUser.author_avatar}`
                 : '/avatar.png'
             }
             alt="Avatar"

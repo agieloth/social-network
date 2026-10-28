@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import styles from './GroupCard.module.css'
+import { API_BASE_URL } from '@/config/api'
 
 export default function GroupCard({ group }) {
   const router = useRouter()
@@ -15,7 +16,7 @@ export default function GroupCard({ group }) {
     setLocalStatus(prev => ({ ...prev, isPending: true }))
     
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${group.id}/membership/join`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${group.id}/membership/join`, {
         method: 'POST',
         credentials: 'include'
       })

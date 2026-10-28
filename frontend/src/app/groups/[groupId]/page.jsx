@@ -1,4 +1,5 @@
 'use client'
+import { API_BASE_URL } from '@/config/api'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { use } from 'react'
@@ -44,13 +45,13 @@ export default function GroupDetailPage({ params }) {
   const handleJoin = async (e) => {
     e.stopPropagation()
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/membership/join`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/membership/join`, {
         method: 'POST',
         credentials: 'include'
       })
       if (!res.ok) throw new Error('Failed to join group')
 
-      const refreshRes = await fetch(`http://localhost:8080/api/groups/${groupId}`, {
+      const refreshRes = await fetch(`${API_BASE_URL}/api/groups/${groupId}`, {
         credentials: 'include'
       })
       if (refreshRes.ok) {
@@ -64,7 +65,7 @@ export default function GroupDetailPage({ params }) {
   useEffect(() => {
     const fetchGroup = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/groups/${groupId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}`, {
           credentials: 'include'
         })
         if (!res.ok) throw new Error('Failed to fetch group')
@@ -86,7 +87,7 @@ export default function GroupDetailPage({ params }) {
       const loadMembers = async () => {
         setLoadingMembers(true);
         try {
-          const res = await fetch(`http://localhost:8080/api/groups/${group.id}/members`, {
+          const res = await fetch(`${API_BASE_URL}/api/groups/${group.id}/members`, {
             credentials: 'include'
           });
 
@@ -111,7 +112,7 @@ export default function GroupDetailPage({ params }) {
 
     setLoadingMembers(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${group.id}/members`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${group.id}/members`, {
         credentials: 'include'
       });
 

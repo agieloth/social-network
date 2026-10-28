@@ -11,8 +11,9 @@ import { useWorker } from '../../../contexts/WorkerContext';
 import { useNavbar } from '../../../contexts/NavBarContext';
 import Image from 'next/image';
 import styles from './Navbar.module.css';
+import { API_BASE_URL } from '@/config/api'
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '');
+// const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/+$/, '');
 
 const toApiUrl = (path) => `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 

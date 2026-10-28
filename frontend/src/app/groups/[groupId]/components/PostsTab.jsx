@@ -4,8 +4,7 @@ import toast from 'react-hot-toast'
 import PostForm from '../../../home/components/PostForm'
 import styles from './PostsTab.module.css'
 import Image from 'next/image'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+import { API_BASE_URL } from '@/config/api'
 
 export default function PostsTab({ group, showPostForm, setShowPostForm }) {
   const [posts, setPosts] = useState([])

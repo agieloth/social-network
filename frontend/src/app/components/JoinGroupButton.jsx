@@ -1,7 +1,9 @@
+import { API_BASE_URL } from '@/config/api'
+
 export default function JoinGroupButton({ groupId }) {
   const handleJoin = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/groups/${groupId}/join`, {
+      const res = await fetch(`${API_BASE_URL}/api/groups/${groupId}/join`, {
         method: 'POST',
         credentials: 'include',
       })
