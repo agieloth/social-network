@@ -1,39 +1,61 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { useWorker } from '../contexts/WorkerContext'
-import { API_BASE_URL } from '@/config/api'
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
+import { useWebSocket } from './useWebSocket';
 
 
 export function useGlobalChat() {
-  const [chatUsers, setChatUsers] = useState([])
-  const [openChats, setOpenChats] = useState([])
-  const [unreadMessages, setUnreadMessages] = useState({})
-  const [messages, setMessages] = useState({})
-  const [input, setInput] = useState({})
-  const [messageNotifications, setMessageNotifications] = useState([])
-  const { worker: contextWorker } = useWorker()
-  const workerRef = useRef(contextWorker)
-  const lastMessageTime = useRef(null)
-  const messageQueueRef = useRef([])
+  const [chatUsers, setChatUsers] = useState([]);
+  const [openChats, setOpenChats] = useState([]);
+  const [unreadMessages, setUnreadMessages] = useState({});
+  const [messages, setMessages] = useState({});
+  const [input, setInput] = useState({});
+  const [messageNotifications, setMessageNotifications] = useState([]);
+  const { worker: contextWorker } = useWorker();
+  const workerRef = useRef(contextWorker);
+  const { socket, isConnected, sendMessage: sendWsMessage } = useWebSocket(workerRef.current?.userId);
 
-  // Update worker ref when context worker changes
+  // Mettre à jour le workerRef
   useEffect(() => {
-    workerRef.current = contextWorker
-  }, [contextWorker])
+    workerRef.current = contextWorker;
+  }, [contextWorker]);
 
+  // Récupérer les utilisateurs du chat
   const fetchChatUsers = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/chat-users`, {
         credentials: 'include',
-      })
-      if (!res.ok) throw new Error('Failed to fetch users')
-      const data = await res.json()
-      setChatUsers(data)
+      });
+      if (!res.ok) throw new Error('Failed to fetch users');
+      const data = await res.json();
+      setChatUsers(data);
     } catch (err) {
-      console.error('Error fetching users:', err)
+      console.error('Error fetching users:', err);
     }
-  }, [])
+  }, []);
+
+  // Envoyer un message via WebSocket
+  const sendMessage = useCallback((recipientId, content, currentUserId) => {
+    if (!content.trim() || !socket) return;
+
+    const message = {
+      type: 'private',
+      to: recipientId,
+      content: content.trim(),
+      timestamp: new Date().toISOString(),
+      from: currentUserId,
+    };
+
+    // Envoyer via WebSocket
+    sendWsMessage(message);
+
+    // Mettre à jour l'input
+    setInput(prev => ({
+      ...prev,
+      [recipientId]: '',
+    }));
+  }, [socket, sendWsMessage]);
 
   const openChat = useCallback((user) => {
     setOpenChats(prev => {
@@ -60,34 +82,6 @@ export function useGlobalChat() {
 
   const closeChat = useCallback((userId) => {
     setOpenChats(prev => prev.filter(c => (c.id || c.ID) !== userId))
-  }, [])
-
-  const sendMessage = useCallback((recipientId, content, currentUserId) => {
-    if (!content.trim() || !workerRef.current) return
-
-    const message = {
-      type: 'message',
-      to: recipientId,
-      content: content.trim(),
-      timestamp: new Date().toISOString(),
-      from: currentUserId,
-    }
-
-    // Clear input
-    setInput(prev => ({
-      ...prev,
-      [recipientId]: ''
-    }))
-
-    // Throttle messages
-    const now = Date.now()
-    if (lastMessageTime.current && now - lastMessageTime.current < 100) {
-      messageQueueRef.current.push(message)
-      return
-    }
-
-    lastMessageTime.current = now
-    workerRef.current.postMessage({ type: 'SEND', message })
   }, [])
 
   const addMessage = useCallback((from, to, content, timestamp) => {

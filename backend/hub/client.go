@@ -14,6 +14,7 @@ type Client struct {
 	ID   int
 	Conn *websocket.Conn
 	Send chan []byte
+	LastActivity time.Time
 }
 
 const (
@@ -30,9 +31,12 @@ func (c *Client) readPump(hub *Hub) {
 		c.Conn.Close()
 	}()
 
+	c.LastActivity = time.Now()
+
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.Conn.SetPongHandler(func(string) error {
+		c.LastActivity = time.Now()
 		c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})

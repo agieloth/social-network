@@ -144,43 +144,43 @@ export default function HomePage() {
 
   // Setup Worker message handler - use Worker from context or create local
   // NEW: Setup Worker message handler - CRITICAL: Keep stable to avoid re-registration
-  const handleWorkerMessage = useCallback((event) => {
-    console.log("📨 Message received from Worker in home/page.jsx:", event.data);
+  // const handleWorkerMessage = useCallback((event) => {
+  //   console.log("📨 Message received from Worker in home/page.jsx:", event.data);
 
-    const { type, data, message } = event.data;
+  //   const { type, data, message } = event.data;
 
-    // Handle incoming PRIVATE messages only (show toast notification)
-    if (data && (type === "private" || data.type === "private")) {
-      console.log('Processing private chat message in home');
+  //   // Handle incoming PRIVATE messages only (show toast notification)
+  //   if (data && (type === "private" || data.type === "private")) {
+  //     console.log('Processing private chat message in home');
 
-      // Add message to global chat context
-      globalChat.addMessageForRecipient(data);
+  //     // Add message to global chat context
+  //     globalChat.addMessageForRecipient(data);
 
-      // Check if message is from another user (not sent by current user)
-      if (data.from !== user?.ID) {
-        handleIncomingMessage(data);
-      }
-    }
-    // Handle GROUP messages (no toast, just store)
-    else if (data && (type === "group_message" || data.type === "group_message")) {
-      console.log('Processing group message in home');
-      // Group messages are handled elsewhere
-    }
-    // Handle other notifications (no toast, just add to notification list with unread count)
-    else if (type === "notification" || type === "follow_request" ||
-      type === "follow_request_response" || type === "follow_request_cancelled" ||
-      type === "group_event_created" || type === "group_join_request" ||
-      type === "group_invitation" || type === "user_online") {
-      const notificationData = data || message;
-      console.log('Processing notification:', type, notificationData);
-      setNotifications(prev => [notificationData, ...prev]);
-      // DO NOT show toast for non-message notifications
-    }
-    else if (type === "status" || type === "error") {
-      const statusMessage = data || message;
-      console.log(`[Worker]: ${statusMessage}`);
-    }
-  }, [user?.ID, handleIncomingMessage, setNotifications, setUnreadCount, globalChat]);
+  //     // Check if message is from another user (not sent by current user)
+  //     if (data.from !== user?.ID) {
+  //       handleIncomingMessage(data);
+  //     }
+  //   }
+  //   // Handle GROUP messages (no toast, just store)
+  //   else if (data && (type === "group_message" || data.type === "group_message")) {
+  //     console.log('Processing group message in home');
+  //     // Group messages are handled elsewhere
+  //   }
+  //   // Handle other notifications (no toast, just add to notification list with unread count)
+  //   else if (type === "notification" || type === "follow_request" ||
+  //     type === "follow_request_response" || type === "follow_request_cancelled" ||
+  //     type === "group_event_created" || type === "group_join_request" ||
+  //     type === "group_invitation" || type === "user_online") {
+  //     const notificationData = data || message;
+  //     console.log('Processing notification:', type, notificationData);
+  //     setNotifications(prev => [notificationData, ...prev]);
+  //     // DO NOT show toast for non-message notifications
+  //   }
+  //   else if (type === "status" || type === "error") {
+  //     const statusMessage = data || message;
+  //     console.log(`[Worker]: ${statusMessage}`);
+  //   }
+  // }, [user?.ID, handleIncomingMessage, setNotifications, setUnreadCount, globalChat]);
 
   useEffect(() => {
     let activeWorker = workerRef.current;

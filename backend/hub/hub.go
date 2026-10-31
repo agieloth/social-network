@@ -4,10 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
-
+	"time"
 	"social/models"
 	"social/services"
 )
+
+const (
+    clientTimeout = 5 * time.Minute // Fermer les clients inactifs après 5 min
+)
+
 
 type Hub struct {
 	Clients    map[int]*Client
@@ -33,24 +38,20 @@ func NewHub(messageService *services.ChatService) *Hub {
 }
 
 func (h *Hub) Run() {
+	ticker := time.NewTicker(clientTimeout)
+    defer ticker.Stop()
+
 	for {
 		select {
 		case client := <-h.Register:
-			h.Clients[client.ID] = client
-			fmt.Printf("\n✅ === USER REGISTERED === \n")
-			fmt.Printf("   User ID: %d\n", client.ID)
-			fmt.Printf("   Total connected users: %d\n", len(h.Clients))
-			fmt.Printf("   Connected user IDs: %v\n\n", func() []int {
-				ids := make([]int, 0)
-				for id := range h.Clients {
-					ids = append(ids, id)
-				}
-				return ids
-			}())
+            h.Clients[client.ID] = client
+            fmt.Printf("\n✅ === USER REGISTERED ===\n")
+            fmt.Printf("   User ID: %d\n", client.ID)
+            fmt.Printf("   Total connected users: %d\n\n", len(h.Clients))
 
 		case client := <-h.Unregister:
-			delete(h.Clients, client.ID)
-			close(client.Send)
+            delete(h.Clients, client.ID)
+            close(client.Send)
 
 		case msg := <-h.Broadcast:
 			fmt.Printf("📨 Broadcast received - Type: %s, From: %d, To: %d\n", msg.Type, msg.From, msg.To)
@@ -127,6 +128,9 @@ func (h *Hub) Run() {
 			default:
 				fmt.Printf("❌ Unknown message type: %s\n", msg.Type)
 			}
+
+			case <-ticker.C:
+				h.cleanupInactiveClients()
 		}
 	}
 }
@@ -235,4 +239,16 @@ func (h *Hub) InvalidateGroupMembersCache(groupID int) {
 	
 	delete(h.groupMembersCache, groupID)
 	fmt.Printf("🔄 Cache invalidated for group %d\n", groupID)
+}
+
+func (h *Hub) cleanupInactiveClients() {
+    now := time.Now()
+    for id, client := range h.Clients {
+        // Vérifier si le client est toujours actif (via un timestamp)
+        if client.LastActivity.Before(now.Add(-clientTimeout)) {
+            delete(h.Clients, id)
+            close(client.Send)
+            fmt.Printf("🗑️  Cleaned up inactive client: %d\n", id)
+        }
+    }
 }
