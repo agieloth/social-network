@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 import { API_BASE_URL } from '@/config/api'
-import { API_BASE_URL } from '@/config/api'
 
 // const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://social-network-backend-helbadao.fly.dev').replace(/\/+$/, '')
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://social-network-backend-helbadao.fly.dev/ws'
